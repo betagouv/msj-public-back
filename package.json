@@ -1,0 +1,28 @@
+{
+  "name": "msj-public-back",
+  "version": "1.0.0",
+  "description": "Backend de l'application publique Mon Suivi Justice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/betagouv/msj-public-back.git"
+  },
+  "author": "Charles Marcoin",
+  "license": "EUPL-1.2",
+  "bugs": {
+    "url": "https://github.com/betagouv/msj-public-back/issues"
+  },
+  "homepage": "https://github.com/betagouv/msj-public-back#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
