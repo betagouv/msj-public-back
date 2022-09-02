@@ -1,4 +1,5 @@
 const express = require('express')
+const helmet = require('helmet')
 const db = require('./models/index')
 // const bodyParser = require('body-parser')
 
@@ -6,6 +7,7 @@ const usersRoutes = require('./routes/users-routes')
 
 const app = express()
 
+app.use(helmet())
 app.use(usersRoutes)
 
 const port = process.env.PORT || 3000
