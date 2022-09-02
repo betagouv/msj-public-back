@@ -1,10 +1,11 @@
 const express = require('express')
 
+const usersController = require('../controllers/users-controller')
+
 const router = express.Router()
 
-// Première route de du backend de l'application PPSMJ
-router.get('/', (req, res, next) => {
-    res.json({message: "Hello from Mon Suivi Justice backend"})
-})
+router.get('/', usersController.getUsers)
+router.post('/signup', usersController.signup)
+router.post('/login', usersController.login)
 
 module.exports = router
