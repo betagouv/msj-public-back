@@ -16,5 +16,12 @@ const login = (req, res, next) => {
   res.json({ message: 'Logged in' })
 }
 
+const invite = (req, res, next) => {
+  console.log(req.body)
+  // Will receive the call from the agent app
+  res.json({ message: 'Invitation sent' })
+}
+
 exports.login = login
 exports.signup = signup
+exports.invite = invite
