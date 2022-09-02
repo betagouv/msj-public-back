@@ -3,7 +3,7 @@ const helmet = require('helmet')
 const db = require('./models/index')
 // const bodyParser = require('body-parser')
 
-const HttpError = require('./models/http-error')
+const HttpError = require('./utils/http-error')
 
 const usersRoutes = require('./routes/users-routes')
 

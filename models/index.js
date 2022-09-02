@@ -7,8 +7,14 @@ const basename = path.basename(__filename)
 const env = process.env.NODE_ENV || 'development'
 const config = require(path.join(__dirname, '/../config/config.js'))[env]
 const db = {}
+const cls = require('cls-hooked')
+
+// For managed transactions in production (see https://bit.ly/3CSIuYK)
+const namespace = cls.createNamespace('msj-transactions')
+Sequelize.useCLS(namespace)
 
 let sequelize
+
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config)
 } else {
