@@ -1,3 +1,5 @@
+const SMSService = require('../services/sms-service')
+
 const signup = (req, res, next) => {
   console.log(req.body)
 
@@ -19,6 +21,15 @@ const login = (req, res, next) => {
 const invite = (req, res, next) => {
   console.log(req.body)
   // Will receive the call from the agent app
+
+  const data = {
+    destinationAddress: '330684424921',
+    messageText: 'test sms invitation ppsmj'
+  }
+
+  const sms = new SMSService(data)
+  sms.send()
+
   res.json({ message: 'Invitation sent' })
 }
 

@@ -1,3 +1,4 @@
+const HttpError = require('./http-error')
 
 async function basicAuth (req, res, next) {
   // Check if headers are present
@@ -11,7 +12,7 @@ async function basicAuth (req, res, next) {
   const [username, password] = credentials.split(':')
 
   if (username !== process.env.HTTP_BASIC_AUTH_USER || password !== process.env.HTTP_BASIC_AUTH_PSWD) {
-    return res.status(401).json({ message: 'Invalid Authentication Credentials' })
+    throw new HttpError('Invalid Authentication Credentials', 401)
   }
 
   next()
