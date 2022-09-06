@@ -1,22 +1,23 @@
-const http = require('http')
+const https = require('https')
+const querystring = require('node:querystring')
 
 class SMSService {
   constructor (smsData) {
     this.username = process.env.LM_ACCOUNT
     this.password = process.env.LM_PWD
     this.host = process.env.LM_HOST
-    this.path = process.env.LM_PATH
+    this.send_path = process.env.LM_SEND_PATH
     this.smsData = smsData
   }
 
-  buildPostDate () {
-    return JSON.stringify(this.smsData)
+  buildPostData () {
+    return querystring.stringify(this.smsData)
   }
 
   send () {
-    const req = http.request({
-      hostname: this.host,
-      path: this.path,
+    const req = https.request({
+      host: 'europe.ipx.com',
+      path: this.send_path,
       method: 'POST',
       auth: `${this.username}:${this.password}`
     },
@@ -32,9 +33,13 @@ class SMSService {
         console.log(error)
       })
     })
-    req.write(this.buildPostDate())
+    req.setHeader('content-type', 'application/x-www-form-urlencoded; charset=UTF-8')
+    req.write(this.buildPostData())
+
+    console.log(req)
+
     req.end()
   }
 }
 
-export default SMSService
+module.exports = SMSService
