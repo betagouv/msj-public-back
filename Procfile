@@ -1,0 +1,1 @@
+postdeploy: npx sequelize-cli db:migrate

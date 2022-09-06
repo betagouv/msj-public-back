@@ -1,50 +1,38 @@
-const { v4: uuidv4 } = require('uuid')
-
-const HttpError = require('../utils/http-error')
-
-const DUMMY_USERS = [
-  {
-    uid: 'u1',
-    name: 'Jean Dupont',
-    email: 'jean.dupont@test.com',
-    password: 'test'
-  },
-  {
-    uid: 'u2',
-    name: 'Bob Dupneu',
-    email: 'bob.dupneu@test.com',
-    password: 'test'
-  }
-]
-
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS })
-}
+const SMSService = require('../services/sms-service')
 
 const signup = (req, res, next) => {
-  const { name, email, password } = req.body
-  const createdUser = {
-    uid: uuidv4(),
-    name,
-    email,
-    password
-  }
-  DUMMY_USERS.push(createdUser)
-  res.status(201).json({ users: DUMMY_USERS })
+  console.log(req.body)
+
+  const { phone, password, invitationToken } = req.body
+
+  console.log(phone, password, invitationToken)
+
+  res.status(201).json({ message: 'Signed up' })
 }
 
 const login = (req, res, next) => {
-  const { email, password } = req.body
+  const { phone, password } = req.body
 
-  const user = DUMMY_USERS.filter((u) => u.email === email)
-
-  if (!user || user.password !== password) {
-    throw new HttpError('Wrong credentials', 401)
-  }
+  console.log('login', phone, password)
 
   res.json({ message: 'Logged in' })
 }
 
-exports.getUsers = getUsers
+const invite = (req, res, next) => {
+  const invitationSmsData = {
+    destinationAddress: req.body.phone,
+    messageText: "invitation depuis l'application agent ppsmj",
+    originatorTON: '1',
+    originatingAddress: process.env.SMS_SENDER,
+    maxConcatenatedMessages: 10
+  }
+
+  const sms = new SMSService(invitationSmsData)
+  sms.send()
+
+  res.json({ message: 'Invitation sent' })
+}
+
 exports.login = login
 exports.signup = signup
+exports.invite = invite
