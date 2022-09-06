@@ -19,15 +19,15 @@ const login = (req, res, next) => {
 }
 
 const invite = (req, res, next) => {
-  const data = {
-    destinationAddress: req.phone,
+  const invitationSmsData = {
+    destinationAddress: req.body.phone,
     messageText: "invitation depuis l'application agent ppsmj",
     originatorTON: '1',
     originatingAddress: process.env.SMS_SENDER,
     maxConcatenatedMessages: 10
   }
 
-  const sms = new SMSService(data)
+  const sms = new SMSService(invitationSmsData)
   sms.send()
 
   res.json({ message: 'Invitation sent' })
