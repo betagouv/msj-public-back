@@ -1,5 +1,5 @@
+const crypto = require('crypto')
 const db = require('../models')
-
 const SMSService = require('../services/sms-service')
 
 const signup = (req, res, next) => {
@@ -21,35 +21,50 @@ const login = (req, res, next) => {
 }
 
 const invite = async (req, res, next) => {
-  const invitationSmsData = {
-    destinationAddress: req.body.phone,
-    messageText: "invitation depuis l'application agent ppsmj",
-    originatorTON: '1',
-    originatingAddress: process.env.SMS_SENDER,
-    maxConcatenatedMessages: 10
-  }
+  const { phone, msjId } = req.body
+
+  let messageText = ''
+
+  const buf = crypto.randomBytes(10)
+  const invitationToken = buf.toString('hex')
+  const currentDate = new Date(2022, 1, 1, 1)
+  const invitationTokenExpirationDate = new Date(currentDate.getTime() + 60 * 60 * 24 * 1000)
 
   try {
-    const result = await db.sequelize.transaction(async () => {
-      const user = await db.User.findOne({ where: { phone: req.body.phone } })
+    const convict = await db.sequelize.transaction(async () => {
+      const user = await db.User.findOne({
+        where: { phone: req.body.phone },
+        defaults: {
+          phone,
+          msjId,
+          invitationToken,
+          invitationTokenExpirationDate
+
+        }
+      })
       return user
     })
 
-    console.log('user trouvé en BDD', result)
+    if (convict) {
+      messageText = 'Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
+    } else {
+      messageText = 'Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
+    }
 
-    // If the execution reaches this line, the transaction has been committed successfully
-    // `result` is whatever was returned from the transaction callback (the `user`, in this case)
+    const invitationSmsData = {
+      destinationAddress: phone,
+      messageText,
+      originatorTON: '1',
+      originatingAddress: process.env.SMS_SENDER,
+      maxConcatenatedMessages: 10
+    }
+
+    const sms = new SMSService(invitationSmsData)
+    sms.send()
+    res.status(200).json({ message: 'Invitation sent' })
   } catch (error) {
-    console.log(error)
-
-    // If the execution reaches this line, an error occurred.
-    // The transaction has already been rolled back automatically by Sequelize!
+    next(error)
   }
-
-  const sms = new SMSService(invitationSmsData)
-  sms.send()
-
-  res.json({ message: 'Invitation sent' })
 }
 
 exports.login = login
