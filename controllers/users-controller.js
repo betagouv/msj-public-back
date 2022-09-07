@@ -31,24 +31,29 @@ const invite = async (req, res, next) => {
   const invitationTokenExpirationDate = new Date(currentDate.getTime() + 60 * 60 * 24 * 1000)
 
   try {
-    const convict = await db.sequelize.transaction(async () => {
-      const user = await db.User.findOne({
+    const { created } = await db.sequelize.transaction(async () => {
+      let [user, created] = await db.User.findOrCreate({
         where: { phone: req.body.phone },
         defaults: {
           phone,
-          msjId,
-          invitationToken,
-          invitationTokenExpirationDate
-
+          msjId
         }
       })
-      return user
+
+      user.set({
+        invitationToken,
+        invitationTokenExpirationDate
+      })
+
+      user = await user.save()
+
+      return { user, created }
     })
 
-    if (convict) {
-      messageText = 'Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
-    } else {
+    if (created) {
       messageText = 'Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
+    } else {
+      messageText = 'Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
     }
 
     const invitationSmsData = {

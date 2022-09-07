@@ -14,7 +14,9 @@ module.exports = (sequelize, DataTypes) => {
   User.init(
     {
       phone: { type: DataTypes.STRING, allowNull: false },
-      password: { type: DataTypes.STRING, allowNull: false }
+      password: { type: DataTypes.STRING, allowNull: false },
+      invitationToken: { type: DataTypes.STRING, allowNull: true },
+      msjId: { type: DataTypes.INTEGER, allowNull: false }
     },
     {
       sequelize,
