@@ -35,9 +35,6 @@ class SMSService {
     })
     req.setHeader('content-type', 'application/x-www-form-urlencoded; charset=UTF-8')
     req.write(this.buildPostData())
-
-    console.log(req)
-
     req.end()
   }
 }

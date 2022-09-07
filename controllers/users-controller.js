@@ -1,3 +1,5 @@
+const db = require('../models')
+
 const SMSService = require('../services/sms-service')
 
 const signup = (req, res, next) => {
@@ -18,13 +20,30 @@ const login = (req, res, next) => {
   res.json({ message: 'Logged in' })
 }
 
-const invite = (req, res, next) => {
+const invite = async (req, res, next) => {
   const invitationSmsData = {
     destinationAddress: req.body.phone,
     messageText: "invitation depuis l'application agent ppsmj",
     originatorTON: '1',
     originatingAddress: process.env.SMS_SENDER,
     maxConcatenatedMessages: 10
+  }
+
+  try {
+    const result = await db.sequelize.transaction(async () => {
+      const user = await db.User.findOne({ where: { phone: req.body.phone } })
+      return user
+    })
+
+    console.log('user trouvé en BDD', result)
+
+    // If the execution reaches this line, the transaction has been committed successfully
+    // `result` is whatever was returned from the transaction callback (the `user`, in this case)
+  } catch (error) {
+    console.log(error)
+
+    // If the execution reaches this line, an error occurred.
+    // The transaction has already been rolled back automatically by Sequelize!
   }
 
   const sms = new SMSService(invitationSmsData)
