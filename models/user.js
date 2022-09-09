@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: { type: DataTypes.STRING, allowNull: false, unique: true },
       password: { type: DataTypes.STRING, allowNull: false },
       invitationToken: { type: DataTypes.STRING, allowNull: true },
-      msjId: { type: DataTypes.INTEGER, allowNull: false }
+      msjId: { type: DataTypes.INTEGER, allowNull: false, unique: true }
     },
     {
       sequelize,
