@@ -16,7 +16,7 @@ class SMSService {
 
   send () {
     const req = https.request({
-      host: 'europe.ipx.com',
+      host: this.host,
       path: this.send_path,
       method: 'POST',
       auth: `${this.username}:${this.password}`

@@ -5,10 +5,12 @@ const SMSService = require('../services/sms-service')
 const signup = (req, res, next) => {
   console.log(req.body)
 
-  const { phone, password, invitationToken } = req.body
+  const { password, invitationToken } = req.body
+  console.log(password, invitationToken)
 
-  console.log(phone, password, invitationToken)
+  // TODO, vérifier si il existe déjà un user avec ce numéro de téléphone
 
+  // TODO : renvoyer le user si il a bien été créé
   res.status(201).json({ message: 'Signed up' })
 }
 
@@ -20,8 +22,16 @@ const login = (req, res, next) => {
   res.json({ message: 'Logged in' })
 }
 
+const signUp = (req, res, next) => {
+  const { password, invitationToken } = req.body
+
+  res.status(200).json({ message: 'Logged in' })
+}
+
 const invite = async (req, res, next) => {
   const { phone, msjId } = req.body
+
+  //  validation sur la présence de ces paramètres.
 
   let messageText = ''
 
@@ -50,10 +60,12 @@ const invite = async (req, res, next) => {
       return { user, created }
     })
 
+    const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
+
     if (created) {
-      messageText = 'Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
+      messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     } else {
-      messageText = 'Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe:'
+      messageText = `Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     }
 
     const invitationSmsData = {
@@ -75,3 +87,4 @@ const invite = async (req, res, next) => {
 exports.login = login
 exports.signup = signup
 exports.invite = invite
+exports.signUp = signUp
