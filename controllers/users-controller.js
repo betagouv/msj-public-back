@@ -5,36 +5,33 @@ const HttpError = require('../utils/http-error')
 
 const signup = async (req, res, next) => {
   const { password, invitationToken } = req.body
+  let invitedUser
 
   try {
     await db.sequelize.transaction(async () => {
-      const [user] = await db.User.findOne({
+      invitedUser = await db.User.findOne({
         where: { invitationToken }
       })
-
-      if (user) {
-        user.set({
+      if (invitedUser) {
+        invitedUser.set({
           password
         })
+        await invitedUser.save()
       } else {
-        const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à ce numéro")
+        const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à ce numéro", 404)
         return next(error)
       }
     })
   } catch (err) {
-    const error = new HttpError('Une erreur s\'est produite lors de la création de votre compte')
+    const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500)
     return next(error)
   }
 
   // TODO : renvoyer le user si il a bien été créé
-  res.status(201).json({ message: 'Signed up' })
+  res.status(201).json({ user: invitedUser.toJSON() })
 }
 
 const login = (req, res, next) => {
-  const { phone, password } = req.body
-
-  console.log('login', phone, password)
-
   res.json({ message: 'Logged in' })
 }
 

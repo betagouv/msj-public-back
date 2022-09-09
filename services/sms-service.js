@@ -29,7 +29,6 @@ class SMSService {
         console.log('BODY: ' + chunk)
       })
       res.on('error', (error) => {
-        // Send to sentry
         console.log(error)
       })
     })
