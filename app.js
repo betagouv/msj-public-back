@@ -1,6 +1,5 @@
 const express = require('express')
 const helmet = require('helmet')
-const bodyParser = require('body-parser')
 const db = require('./models/index')
 
 const HttpError = require('./utils/http-error')

@@ -1,14 +1,30 @@
 const crypto = require('crypto')
 const db = require('../models')
 const SMSService = require('../services/sms-service')
+const HttpError = require('../utils/http-error')
 
-const signup = (req, res, next) => {
-  console.log(req.body)
-
+const signup = async (req, res, next) => {
   const { password, invitationToken } = req.body
-  console.log(password, invitationToken)
 
-  // TODO, vérifier si il existe déjà un user avec ce numéro de téléphone
+  try {
+    await db.sequelize.transaction(async () => {
+      const [user] = await db.User.findOne({
+        where: { invitationToken }
+      })
+
+      if (user) {
+        user.set({
+          password
+        })
+      } else {
+        const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à ce numéro")
+        return next(error)
+      }
+    })
+  } catch (err) {
+    const error = new HttpError('Une erreur s\'est produite lors de la création de votre compte')
+    return next(error)
+  }
 
   // TODO : renvoyer le user si il a bien été créé
   res.status(201).json({ message: 'Signed up' })
@@ -20,12 +36,6 @@ const login = (req, res, next) => {
   console.log('login', phone, password)
 
   res.json({ message: 'Logged in' })
-}
-
-const signUp = (req, res, next) => {
-  const { password, invitationToken } = req.body
-
-  res.status(200).json({ message: 'Logged in' })
 }
 
 const invite = async (req, res, next) => {
@@ -79,12 +89,11 @@ const invite = async (req, res, next) => {
     const sms = new SMSService(invitationSmsData)
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
-  } catch (error) {
-    next(error)
+  } catch (err) {
+    return next(err)
   }
 }
 
 exports.login = login
 exports.signup = signup
 exports.invite = invite
-exports.signUp = signUp
