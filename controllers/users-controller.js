@@ -1,4 +1,6 @@
+const bcrypt = require('bcryptjs/dist/bcrypt')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const db = require('../models')
 const SMSService = require('../services/sms-service')
 const HttpError = require('../utils/http-error')
@@ -6,6 +8,7 @@ const HttpError = require('../utils/http-error')
 const signup = async (req, res, next) => {
   const { password, invitationToken } = req.body
   let invitedUser
+  let token
 
   try {
     await db.sequelize.transaction(async () => {
@@ -13,12 +16,28 @@ const signup = async (req, res, next) => {
         where: { invitationToken }
       })
       if (invitedUser) {
+        // TODO: investigate differences between bcrypt and crypto
+        let hashedPassword
+        try {
+          hashedPassword = bcrypt.hash(password, 12)
+        } catch (err) {
+          const error = new HttpError('Impossible de créer l\'utilisateur', 500)
+          return next(error)
+        }
+
+        try {
+          token = jwt.sign({ id: invitedUser.id, phone: invitedUser.phone }, process.env.JWT_SECRET, { expiresIn: '24h' })
+        } catch (err) {
+          const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
+          return next(error)
+        }
+
         invitedUser.set({
-          password
+          password: hashedPassword
         })
         await invitedUser.save()
       } else {
-        const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à ce numéro", 404)
+        const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à votre numéro", 404)
         return next(error)
       }
     })
@@ -27,12 +46,54 @@ const signup = async (req, res, next) => {
     return next(error)
   }
 
-  // TODO : renvoyer le user si il a bien été créé
-  res.status(201).json({ user: invitedUser.toJSON() })
+  res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token })
 }
 
-const login = (req, res, next) => {
-  res.json({ message: 'Logged in' })
+const login = async (req, res, next) => {
+  const { phone, password } = req.body
+
+  let user
+
+  // Check user existence
+  try {
+    await db.sequelize.transaction(async () => {
+      user = await db.User.findOne({
+        where: { phone }
+      })
+    })
+  } catch (err) {
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
+    return next(error)
+  }
+
+  if (!user) {
+    const error = new HttpError('Le numéro de téléphone ou le mot de passe ne sont pas valides', 404)
+    return next(error)
+  }
+
+  // Check password
+  let isValidPassword = false
+  try {
+    isValidPassword = await bcrypt.compare(password, user.password)
+  } catch (err) {
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
+    return next(error)
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError('Le numéro de téléphone ou le mot de passe ne sont pas valides', 404)
+    return next(error)
+  }
+
+  let token
+  try {
+    token = jwt.sign({ id: user.id, phone: user.phone }, process.env.JWT_SECRET, { expiresIn: '24h' })
+  } catch (err) {
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
+    return next(error)
+  }
+
+  res.status(201).json({ userId: user.id, phone: user.phone, token })
 }
 
 const invite = async (req, res, next) => {
