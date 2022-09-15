@@ -1,10 +1,10 @@
 const express = require('express')
 const helmet = require('helmet')
-const db = require('./models/index')
 
 const HttpError = require('./utils/http-error')
 
 const usersRoutes = require('./routes/users-routes')
+const appointmentsRoutes = require('./routes/appointments-routes')
 
 const app = express()
 
@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/users', usersRoutes)
+app.use('/api/appointments', appointmentsRoutes)
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404)

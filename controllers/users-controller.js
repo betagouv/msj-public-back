@@ -19,7 +19,7 @@ const signup = async (req, res, next) => {
         // TODO: investigate differences between bcrypt and crypto
         let hashedPassword
         try {
-          hashedPassword = bcrypt.hash(password, 12)
+          hashedPassword = await bcrypt.hash(password, 12)
         } catch (err) {
           const error = new HttpError('Impossible de créer l\'utilisateur', 500)
           return next(error)
@@ -42,8 +42,9 @@ const signup = async (req, res, next) => {
       }
     })
   } catch (err) {
-    const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500)
-    return next(error)
+    console.log(err)
+    // const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500)
+    return next(err.message)
   }
 
   res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token })
@@ -62,6 +63,7 @@ const login = async (req, res, next) => {
       })
     })
   } catch (err) {
+    console.log('erreur trouvage du user', err)
     const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
     return next(error)
   }
@@ -93,7 +95,7 @@ const login = async (req, res, next) => {
     return next(error)
   }
 
-  res.status(201).json({ userId: user.id, phone: user.phone, token })
+  res.status(201).json({ userId: user.id, phone: user.phone, msjId: user.msjId, token })
 }
 
 const invite = async (req, res, next) => {
