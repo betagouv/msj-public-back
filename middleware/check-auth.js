@@ -3,7 +3,9 @@ const jwt = require('jsonwebtoken')
 const HttpError = require('../utils/http-error')
 
 const checkAuth = (req, res, next) => {
-  console.log('middleware check auth')
+  if (req.method === 'OPTIONS') {
+    next()
+  }
   try {
     const token = req.headers.authorization.split(' ')[1]
 
