@@ -108,7 +108,7 @@ const invite = async (req, res, next) => {
   const buf = crypto.randomBytes(10)
   const invitationToken = buf.toString('hex')
   const currentDate = new Date(2022, 1, 1, 1)
-  const invitationTokenExpirationDate = new Date(currentDate.getTime() + 60 * 60 * 24 * 1000)
+  const invitationTokenExpirationDate = new Date(currentDate.getTime() + 1000 * 60 * 60)
 
   try {
     const { created } = await db.sequelize.transaction(async () => {
