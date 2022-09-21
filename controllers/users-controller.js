@@ -17,6 +17,7 @@ const signup = async (req, res, next) => {
       })
       if (invitedUser) {
         // TODO: investigate differences between bcrypt and crypto
+        //  TODO: check invitationTokenExpirationDate expiration date (should be 24h)
         let hashedPassword
         try {
           hashedPassword = await bcrypt.hash(password, 12)
@@ -26,7 +27,7 @@ const signup = async (req, res, next) => {
         }
 
         try {
-          token = jwt.sign({ id: invitedUser.id, phone: invitedUser.phone }, process.env.JWT_SECRET, { expiresIn: '24h' })
+          token = jwt.sign({ id: invitedUser.id, phone: invitedUser.phone }, process.env.JWT_SECRET, { expiresIn: '1h' })
         } catch (err) {
           const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
           return next(error)
@@ -89,7 +90,7 @@ const login = async (req, res, next) => {
 
   let token
   try {
-    token = jwt.sign({ id: user.id, phone: user.phone }, process.env.JWT_SECRET, { expiresIn: '24h' })
+    token = jwt.sign({ id: user.id, phone: user.phone }, process.env.JWT_SECRET, { expiresIn: '1h' })
   } catch (err) {
     const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
     return next(error)
@@ -107,8 +108,7 @@ const invite = async (req, res, next) => {
 
   const buf = crypto.randomBytes(10)
   const invitationToken = buf.toString('hex')
-  const currentDate = new Date(2022, 1, 1, 1)
-  const invitationTokenExpirationDate = new Date(currentDate.getTime() + 1000 * 60 * 60)
+  const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
 
   try {
     const { created } = await db.sequelize.transaction(async () => {
