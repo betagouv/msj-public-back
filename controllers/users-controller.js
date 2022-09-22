@@ -54,13 +54,15 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { phone, password } = req.body
 
+  const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
+
   let user
 
   // Check user existence
   try {
     await db.sequelize.transaction(async () => {
       user = await db.User.findOne({
-        where: { phone }
+        where: { phone: phoneWithAreaCode }
       })
     })
   } catch (err) {
