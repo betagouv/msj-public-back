@@ -36,7 +36,14 @@ const signup = async (req, res, next) => {
         invitedUser.set({
           password: hashedPassword
         })
-        await invitedUser.save()
+
+        try {
+          await invitedUser.save()
+        } catch (err) {
+          console.log(err)
+          const error = new HttpError("Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site", 500)
+          return next(error)
+        }
       } else {
         const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à votre numéro", 404)
         return next(error)

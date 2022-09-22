@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  up (queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         queryInterface.addColumn('Users', 'invitationToken', {
@@ -11,7 +11,7 @@ module.exports = {
     })
   },
 
-  async down (queryInterface, Sequelize) {
+  down (queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         queryInterface.removeColumn('Users', 'invitationToken', { transaction: t })
