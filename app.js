@@ -25,13 +25,14 @@ app.use('/api/appointments', appointmentsRoutes)
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404)
-  next(error)
+  return next(error)
 })
 
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error)
   }
+
   res.status(error.code || 500)
   res.json({ message: error.message || 'unknown error occured' })
 })

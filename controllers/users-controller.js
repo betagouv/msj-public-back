@@ -50,12 +50,11 @@ const signup = async (req, res, next) => {
       }
     })
   } catch (err) {
-    console.log(err)
-    // const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500)
-    return next(err.message)
+    const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500)
+    return next(error)
   }
 
-  res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token })
+  res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token, msjId: invitedUser.msjId })
 }
 
 const login = async (req, res, next) => {
@@ -109,7 +108,9 @@ const login = async (req, res, next) => {
 }
 
 const invite = async (req, res, next) => {
-  const { phone, msjId } = req.body
+  const { phone, msj_id: msjId } = req.body
+
+  console.log('on passe dans invite', req.body)
 
   //  validation sur la présence de ces paramètres.
 
@@ -159,6 +160,7 @@ const invite = async (req, res, next) => {
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
   } catch (err) {
+    console.log('erreur invitation', err)
     return next(err)
   }
 }
