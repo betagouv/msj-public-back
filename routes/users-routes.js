@@ -10,6 +10,6 @@ router.post('/signup', usersController.signup)
 router.post('/login', usersController.login)
 
 // Specific endpoint for calls from the agents app
-router.get('/invite', basicAuth, usersController.invite)
+router.post('/invite', basicAuth, usersController.invite)
 
 module.exports = router

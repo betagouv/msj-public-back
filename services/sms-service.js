@@ -16,7 +16,7 @@ class SMSService {
 
   send () {
     const req = https.request({
-      host: 'europe.ipx.com',
+      host: this.host,
       path: this.send_path,
       method: 'POST',
       auth: `${this.username}:${this.password}`
@@ -29,15 +29,12 @@ class SMSService {
         console.log('BODY: ' + chunk)
       })
       res.on('error', (error) => {
-        // Send to sentry
         console.log(error)
       })
     })
+
     req.setHeader('content-type', 'application/x-www-form-urlencoded; charset=UTF-8')
     req.write(this.buildPostData())
-
-    console.log(req)
-
     req.end()
   }
 }

@@ -13,8 +13,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      phone: { type: DataTypes.STRING, allowNull: false },
-      password: { type: DataTypes.STRING, allowNull: false }
+      phone: { type: DataTypes.STRING, allowNull: false, unique: true },
+      password: { type: DataTypes.STRING, allowNull: true },
+      invitationToken: { type: DataTypes.STRING, allowNull: true },
+      msjId: { type: DataTypes.INTEGER, allowNull: false, unique: true }
     },
     {
       sequelize,
