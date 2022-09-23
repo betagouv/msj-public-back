@@ -40,7 +40,6 @@ const signup = async (req, res, next) => {
         try {
           await invitedUser.save()
         } catch (err) {
-          console.log(err)
           const error = new HttpError("Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site", 500)
           return next(error)
         }
@@ -72,7 +71,6 @@ const login = async (req, res, next) => {
       })
     })
   } catch (err) {
-    console.log('erreur trouvage du user', err)
     const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500)
     return next(error)
   }
@@ -110,10 +108,7 @@ const login = async (req, res, next) => {
 const invite = async (req, res, next) => {
   const { phone, msj_id: msjId } = req.body
 
-  console.log('on passe dans invite', req.body)
-
-  //  validation sur la présence de ces paramètres.
-
+  // TODO : validation sur la présence de ces paramètres.
   let messageText = ''
 
   const buf = crypto.randomBytes(10)
@@ -160,7 +155,6 @@ const invite = async (req, res, next) => {
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
   } catch (err) {
-    console.log('erreur invitation', err)
     return next(err)
   }
 }

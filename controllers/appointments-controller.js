@@ -3,7 +3,6 @@ const axios = require('axios')
 
 const getUserAppointments = async (req, res, next) => {
   const msjId = req.params.msjId
-  console.log(msjId)
 
   const url = `${process.env.AGENTS_APP_API_URL}/convicts/${msjId}`
   const username = process.env.AGENTS_APP_BASIC_AUTH_USERNAME
