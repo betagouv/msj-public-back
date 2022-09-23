@@ -48,10 +48,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # - name: Setup test db
-      #   run: npx sequelize-cli db:migrate
-      #   env:
-      #     DATABASE_URL: postgres://ppsmj:ppsmj@localhost:5432/ppsmj
+      - name: Setup test db
+        run: npx sequelize-cli db:migrate
+        env:
+          DATABASE_URL: postgres://ppsmj:ppsmj@localhost:5432/ppsmj
 
-      # - name: seed db
-      #   run: npx sequelize-cli db:seed:all
+      - name: seed db
+        run: npx sequelize-cli db:seed:all
