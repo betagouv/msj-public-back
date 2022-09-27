@@ -105,6 +105,64 @@ const login = async (req, res, next) => {
   res.status(201).json({ userId: user.id, phone: user.phone, msjId: user.msjId, token })
 }
 
+const resetPassword = async (req, res, next) => {
+  const { phone } = req.body
+
+  const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
+
+  let user
+
+  const buf = crypto.randomBytes(10)
+  const invitationToken = buf.toString('hex')
+  const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
+
+  // Check user existence
+  try {
+    await db.sequelize.transaction(async () => {
+      user = await db.User.findOne({
+        where: { phone: phoneWithAreaCode }
+      })
+    })
+  } catch (err) {
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site", 500)
+    return next(error)
+  }
+
+  if (!user) {
+    const error = new HttpError('Le numéro de téléphone ne correspond à aucun utilisateur', 404)
+    return next(error)
+  }
+
+  try {
+    user.set({
+      invitationToken,
+      invitationTokenExpirationDate
+    })
+
+    await db.sequelize.transaction(async () => {
+      user = await user.save()
+    })
+  } catch (err) {
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site", 500)
+    return next(error)
+  }
+
+  const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
+  const messageText = `Bonjour, vous avez demandé à modifier votre mot de passe sur Mon suivi Justice. Pour effectuer ce changement, cliquez sur le lien suivant : ${invitationUrl}`
+
+  const resetPasswordSMSData = {
+    destinationAddress: phoneWithAreaCode,
+    messageText,
+    originatorTON: '1',
+    originatingAddress: process.env.SMS_SENDER,
+    maxConcatenatedMessages: 10
+  }
+
+  const sms = new SMSService(resetPasswordSMSData)
+  sms.send()
+  res.status(200).json({ message: 'Invitation sent' })
+}
+
 const invite = async (req, res, next) => {
   const { phone, msj_id: msjId } = req.body
 
@@ -162,3 +220,4 @@ const invite = async (req, res, next) => {
 exports.login = login
 exports.signup = signup
 exports.invite = invite
+exports.resetPassword = resetPassword
