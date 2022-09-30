@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const db = require('../models')
 const SMSService = require('../services/sms-service')
 const HttpError = require('../utils/http-error')
+const axios = require('axios')
 
 const signup = async (req, res, next) => {
   const { password, invitationToken } = req.body
@@ -53,7 +54,7 @@ const signup = async (req, res, next) => {
     return next(error)
   }
 
-  res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token, msjId: invitedUser.msjId })
+  res.status(201).json({ userId: invitedUser.id, phone: invitedUser.phone, token, msjId: invitedUser.msjId, firstName: invitedUser.firstName, lastName: invitedUser.lastName })
 }
 
 const login = async (req, res, next) => {
@@ -102,7 +103,7 @@ const login = async (req, res, next) => {
     return next(error)
   }
 
-  res.status(201).json({ userId: user.id, phone: user.phone, msjId: user.msjId, token })
+  res.status(201).json({ userId: user.id, phone: user.phone, msjId: user.msjId, token, firstName: user.firstName, lastName: user.lastName })
 }
 
 const resetPassword = async (req, res, next) => {
@@ -164,7 +165,7 @@ const resetPassword = async (req, res, next) => {
 }
 
 const invite = async (req, res, next) => {
-  const { phone, msj_id: msjId } = req.body
+  const { phone, msj_id: msjId, first_name: firstName, last_name: lastName } = req.body
 
   // TODO : validation sur la présence de ces paramètres.
   let messageText = ''
@@ -179,6 +180,8 @@ const invite = async (req, res, next) => {
         where: { phone: req.body.phone },
         defaults: {
           phone,
+          firstName,
+          lastName,
           msjId
         }
       })
@@ -217,7 +220,36 @@ const invite = async (req, res, next) => {
   }
 }
 
+const getCpip = async (req, res, next) => {
+  const msjId = req.params.msjId
+
+  const url = `${process.env.AGENTS_APP_API_URL}/convicts/${msjId}/cpip`
+  const username = process.env.AGENTS_APP_BASIC_AUTH_USERNAME
+  const password = process.env.AGENTS_APP_BASIC_AUTH_PASSWORD
+
+  const headers = {
+    Authorization: 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+    'Content-type': 'application/json'
+  }
+
+  let cpip
+
+  try {
+    const response = await axios.get(url, {
+      headers
+    })
+
+    cpip = response.data
+  } catch (err) {
+    const error = new HttpError('Impossible de trouver un cpip référent', 404)
+    return next(error)
+  }
+
+  res.status(201).json(cpip)
+}
+
 exports.login = login
 exports.signup = signup
 exports.invite = invite
 exports.resetPassword = resetPassword
+exports.getCpip = getCpip
