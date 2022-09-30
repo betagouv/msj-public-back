@@ -115,7 +115,7 @@ const resetPassword = async (req, res, next) => {
 
   const buf = crypto.randomBytes(10)
   const invitationToken = buf.toString('hex')
-  const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
+  // const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
 
   // Check user existence
   try {
@@ -136,8 +136,7 @@ const resetPassword = async (req, res, next) => {
 
   try {
     user.set({
-      invitationToken,
-      invitationTokenExpirationDate
+      invitationToken
     })
 
     await db.sequelize.transaction(async () => {
@@ -174,11 +173,11 @@ const invite = async (req, res, next) => {
 
   const buf = crypto.randomBytes(10)
   const invitationToken = buf.toString('hex')
-  const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
+  // const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
 
   try {
-    const { created } = await db.sequelize.transaction(async () => {
-      let [user, created] = await db.User.findOrCreate({
+    const created = await db.sequelize.transaction(async (t) => {
+      const [user, created] = await db.User.findOrCreate({
         where: { phone: req.body.phone },
         defaults: {
           phone,
@@ -189,13 +188,12 @@ const invite = async (req, res, next) => {
       })
 
       user.set({
-        invitationToken,
-        invitationTokenExpirationDate
+        invitationToken
       })
 
-      user = await user.save()
+      await user.save()
 
-      return { user, created }
+      return created
     })
 
     const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
