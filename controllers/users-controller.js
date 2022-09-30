@@ -167,6 +167,8 @@ const resetPassword = async (req, res, next) => {
 const invite = async (req, res, next) => {
   const { phone, msj_id: msjId, first_name: firstName, last_name: lastName } = req.body
 
+  console.log('body de la  requête', req.body)
+
   // TODO : validation sur la présence de ces paramètres.
   let messageText = ''
 
@@ -216,6 +218,7 @@ const invite = async (req, res, next) => {
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
   } catch (err) {
+    console.log('erreur invitation sms', err)
     return next(err)
   }
 }
