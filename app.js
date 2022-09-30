@@ -1,7 +1,18 @@
 const express = require('express')
 const helmet = require('helmet')
+const Sentry = require('@sentry/node')
+// eslint-disable-next-line no-unused-vars
+const SentryTracing = require('@sentry/tracing')
 
 const HttpError = require('./utils/http-error')
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0
+})
 
 const usersRoutes = require('./routes/users-routes')
 const appointmentsRoutes = require('./routes/appointments-routes')
