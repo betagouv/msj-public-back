@@ -177,14 +177,13 @@ const invite = async (req, res, next) => {
 
   try {
     const { user, created } = await db.sequelize.transaction(async (t) => {
-      const [user, created] = await db.User.findOrCreate({
-        where: { phone: req.body.phone },
-        defaults: {
-          phone,
-          firstName,
-          lastName,
-          msjId
-        }
+      const [user, created] = await db.User.create({
+
+        phone,
+        firstName,
+        lastName,
+        msjId
+
       })
 
       return { user, created }
