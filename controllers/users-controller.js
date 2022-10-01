@@ -176,7 +176,7 @@ const invite = async (req, res, next) => {
   // const invitationTokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
 
   try {
-    const created = await db.sequelize.transaction(async (t) => {
+    const { user, created } = await db.sequelize.transaction(async (t) => {
       const [user, created] = await db.User.findOrCreate({
         where: { phone: req.body.phone },
         defaults: {
@@ -187,13 +187,15 @@ const invite = async (req, res, next) => {
         }
       })
 
-      user.set({
-        invitationToken
-      })
+      return { user, created }
+    })
 
+    user.set({
+      invitationToken
+    })
+
+    await db.sequelize.transaction(async (t) => {
       await user.save()
-
-      return created
     })
 
     const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
