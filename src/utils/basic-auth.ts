@@ -1,8 +1,16 @@
-const HttpError = require('./http-error')
+import { Request, Response, NextFunction } from 'express'
+import HttpError from './http-error'
 
-async function basicAuth (req, res, next) {
+export default async function basicAuth (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   // Check if headers are present
-  if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.includes('Basic ')
+  ) {
     return res.status(401).json({ message: 'Missing Authorization Header' })
   }
 
@@ -11,11 +19,12 @@ async function basicAuth (req, res, next) {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii')
   const [username, password] = credentials.split(':')
 
-  if (username !== process.env.HTTP_BASIC_AUTH_USER || password !== process.env.HTTP_BASIC_AUTH_PSWD) {
+  if (
+    username !== process.env.HTTP_BASIC_AUTH_USER ||
+    password !== process.env.HTTP_BASIC_AUTH_PSWD
+  ) {
     throw new HttpError('Invalid Authentication Credentials', 401)
   }
 
   next()
 }
-
-module.exports = basicAuth

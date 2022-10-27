@@ -1,8 +1,6 @@
-const express = require('express')
-
-const basicAuth = require('../utils/basic-auth')
-
-const usersController = require('../controllers/users-controller')
+import express from 'express';
+import basicAuth from '../utils/basic-auth';
+import usersController from '../controllers/users-controller'
 
 const router = express.Router()
 
@@ -14,4 +12,4 @@ router.get('/:msjId/cpip', usersController.getCpip)
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
 
-module.exports = router
+export default router;

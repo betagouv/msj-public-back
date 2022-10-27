@@ -1,7 +1,13 @@
-const HttpError = require('../utils/http-error')
-const axios = require('axios')
+import { NextFunction, Request, Response } from 'express'
+import axios from 'axios'
 
-const getUserAppointments = async (req, res, next) => {
+import HttpError from '../utils/http-error'
+
+const getUserAppointments = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const msjId = req.params.msjId
 
   const url = `${process.env.AGENTS_APP_API_URL}/convicts/${msjId}`
@@ -9,7 +15,8 @@ const getUserAppointments = async (req, res, next) => {
   const password = process.env.AGENTS_APP_BASIC_AUTH_PASSWORD
 
   const headers = {
-    Authorization: 'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
+    Authorization:
+      'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
     'Content-type': 'application/json'
   }
 
@@ -22,11 +29,14 @@ const getUserAppointments = async (req, res, next) => {
 
     appointments = response.data.appointments
   } catch (err) {
-    const error = new HttpError("Une erreur s'est produite lors de la récupération des rendez-vous", 500)
+    const error = new HttpError(
+      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      500
+    )
     return next(error)
   }
 
   res.status(201).json(appointments)
 }
 
-exports.getUserAppointments = getUserAppointments
+export default { getUserAppointments }
