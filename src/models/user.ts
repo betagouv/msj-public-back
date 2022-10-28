@@ -1,48 +1,23 @@
-import {
-  Table,
-  Column,
-  Model,
-  Unique,
-  AllowNull,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt
-} from 'sequelize-typescript'
+import { DataTypes } from 'sequelize'
+import { Table, Column, Model } from 'sequelize-typescript'
 
 @Table
 export default class User extends Model {
-  @Column
-  @AllowNull
+  @Column({ type: DataTypes.STRING, allowNull: true })
     firstName: string | undefined
 
-  @Column
-  @AllowNull
+  @Column({ type: DataTypes.STRING, allowNull: true })
     lastName: string | undefined
 
-  @Column
-  @Unique
+  @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
     phone!: string
 
-  @Column
-  @Unique
+  @Column({ type: DataTypes.INTEGER, allowNull: false, unique: true })
     msjId!: number
 
-  @Column
-  @AllowNull
+  @Column({ type: DataTypes.STRING, allowNull: true })
     password: string | undefined
 
-  @Column
-  @AllowNull
+  @Column({ type: DataTypes.STRING, allowNull: true })
     invitationToken: string | undefined
-
-  @CreatedAt
-    creationDate!: Date
-
-  @UpdatedAt
-  @AllowNull
-    updatedOn: Date | undefined
-
-  @DeletedAt
-  @AllowNull
-    deletionDate: Date | undefined
 }

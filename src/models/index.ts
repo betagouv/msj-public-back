@@ -1,10 +1,15 @@
 import { Sequelize } from 'sequelize-typescript'
+
+import { getEnv } from '../utils/env'
 import User from './user'
 
+console.log(getEnv('DATABASE_URL'))
 const sequelize = new Sequelize({
-  database: process.env.DATABASE_URL,
+  database: 'ppsmj',
   dialect: 'postgres',
-  models: [User]
+  username: 'ppsmj',
+  password: 'MonSuiviJustice2022',
+  models: [User] // or [Player, Team],
 })
 
 export default sequelize

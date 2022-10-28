@@ -39,4 +39,4 @@ const getUserAppointments = async (
   res.status(201).json(appointments)
 }
 
-export default { getUserAppointments }
+export { getUserAppointments }

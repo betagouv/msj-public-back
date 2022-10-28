@@ -80,7 +80,6 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   const { phone, password } = req.body
-
   const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
 
   let user
@@ -91,6 +90,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       where: { phone: phoneWithAreaCode }
     })
   } catch (err) {
+    console.error(err)
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
       500
@@ -306,8 +306,4 @@ const getCpip = async (req: Request, res: Response, next: NextFunction) => {
   res.status(201).json(cpip)
 }
 
-exports.login = login
-exports.signup = signup
-exports.invite = invite
-exports.resetPassword = resetPassword
-exports.getCpip = getCpip
+export { login, signup, invite, resetPassword, getCpip }

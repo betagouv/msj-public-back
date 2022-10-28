@@ -1,23 +1,9 @@
-import * as dotenv from 'dotenv'
 import express, { Express, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
-import * as Sentry from '@sentry/node'
-// eslint-disable-next-line no-unused-vars
-import * as SentryTracing from '@sentry/tracing'
 
 import appointmentsRoutes from './routes/appointments-routes'
 import usersRoutes from './routes/users-routes'
 import HttpError from './utils/http-error'
-
-dotenv.config()
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-
-  // We recommend adjusting this value in production, or using tracesSampler
-  // for finer control
-  tracesSampleRate: 1.0
-})
 
 const app: Express = express()
 
@@ -53,7 +39,4 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   res.json({ message: error.message || 'unknown error occured' })
 })
 
-const port = process.env.PORT || 3000
-app.listen(port, function () {
-  console.log('Mon Suivi Justice back-end listening on', port)
-})
+export default app
