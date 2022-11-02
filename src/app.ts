@@ -31,13 +31,20 @@ app.use((req: Request, res: Response, next) => {
   return next(error)
 })
 
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  if (res.headersSent) {
-    return next(error)
-  }
+app.use(
+  (
+    error: { code?: number, message?: string },
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    if (res.headersSent) {
+      return next(error)
+    }
 
-  res.status(error.code || 500)
-  res.json({ message: error.message || 'unknown error occured' })
-})
+    res.status(error.code ?? 500)
+    res.json({ message: error.message ?? 'unknown error occured' })
+  }
+)
 
 export default app

@@ -9,7 +9,11 @@ import HttpError from '../utils/http-error'
 import SMSService from '../services/sms-service'
 import { getEnv } from '../utils/env'
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
+const signup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { password, invitationToken } = req.body
   let invitedUser: User | null = null
   let token
@@ -79,7 +83,11 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
   })
 }
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
+const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { phone, password } = req.body
   const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
 
@@ -110,9 +118,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   // Check password
   let isValidPassword = false
   try {
-    if (user.password) {
-      isValidPassword = await bcrypt.compare(password, user.password)
-    }
+    isValidPassword = await bcrypt.compare(password, user.password ?? '')
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
@@ -156,7 +162,7 @@ const resetPassword = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { phone } = req.body
 
   const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
@@ -219,7 +225,11 @@ const resetPassword = async (
   res.status(200).json({ message: 'Invitation sent' })
 }
 
-const invite = async (req: Request, res: Response, next: NextFunction) => {
+const invite = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const {
     phone,
     msj_id: msjId,
@@ -280,7 +290,11 @@ const invite = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-const getCpip = async (req: Request, res: Response, next: NextFunction) => {
+const getCpip = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const msjId = req.params.msjId
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}/cpip`
   const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')

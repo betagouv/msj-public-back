@@ -15,11 +15,11 @@ class SMSService {
     this.sendPath = getEnv('LM_SEND_PATH')
   }
 
-  buildPostData () {
+  buildPostData (): string {
     return querystring.stringify(this.smsData)
   }
 
-  send () {
+  send (): void {
     const req = https.request(
       {
         host: this.host,
@@ -28,11 +28,11 @@ class SMSService {
         auth: `${this.username}:${this.password}`
       },
       (res) => {
-        console.log('STATUS: ' + res.statusCode)
-        console.log('HEADERS: ' + JSON.stringify(res.headers))
+        console.log(`STATUS: ${res.statusCode ?? ''}`)
+        console.log(`HEADERS: ${JSON.stringify(res.headers)}`)
         res.setEncoding('utf8')
-        res.on('data', (chunk) => {
-          console.log('BODY: ' + chunk)
+        res.on('data', (chunk: string) => {
+          console.log(`BODY: ${chunk}`)
         })
         res.on('error', (error) => {
           console.log(error)

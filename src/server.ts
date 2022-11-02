@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node'
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as SentryTracing from '@sentry/tracing'
 import app from './app'
 import sequelize from './models'

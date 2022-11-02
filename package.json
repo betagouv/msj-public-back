@@ -4,7 +4,7 @@
   "description": "Backend de l'application publique Mon Suivi Justice",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/server.js",
+    "start": "node ./build/server.js",
     "build": "tsc --project ./tsconfig.production.json",
     "dev": "ts-node-dev src/server.ts",
     "debug": "npm run dev -- --inspect",

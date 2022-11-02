@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+// see https://github.com/standard/eslint-config-standard-with-typescript/issues/613
+
 import express from 'express'
 import basicAuth from '../utils/basic-auth'
 import * as usersController from '../controllers/users-controller'

@@ -8,7 +8,7 @@ const getUserAppointments = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const msjId = req.params.msjId
 
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}`

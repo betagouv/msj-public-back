@@ -2,21 +2,19 @@ import { Request, Response, NextFunction } from 'express'
 import { getEnv } from './env'
 import HttpError from './http-error'
 
-export default async function basicAuth (
+export default function basicAuth (
   req: Request,
   res: Response,
   next: NextFunction
-) {
+): void {
+  const authorizationHeader = req.headers.authorization ?? ''
   // Check if headers are present
-  if (
-    !req.headers.authorization ||
-    !req.headers.authorization.includes('Basic ')
-  ) {
-    return res.status(401).json({ message: 'Missing Authorization Header' })
+  if (!authorizationHeader.includes('Basic ')) {
+    res.status(401).json({ message: 'Missing Authorization Header' })
   }
 
   // Check credentials
-  const base64Credentials = req.headers.authorization.split(' ')[1]
+  const base64Credentials = req?.headers?.authorization?.split(' ')[1] ?? ''
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii')
   const [username, password] = credentials.split(':')
 
