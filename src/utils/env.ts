@@ -5,7 +5,7 @@ dotenv.config()
 export function getEnv (varName: string, defaultValue?: string): string {
   const envValue = process.env[varName]
   const value = envValue ?? defaultValue
-  if (typeof value === 'undefined') {
+  if (value === undefined) {
     throw new Error(`missing env variable ${varName}`)
   }
 
