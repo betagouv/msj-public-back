@@ -19,6 +19,7 @@ console.log(`PORT: ${port}`)
 sequelize
   .sync()
   .then(() => {
+    console.log('SYNCHED')
     app.listen(port, function () {
       console.log('Mon Suivi Justice back-end listening on', port)
     })
