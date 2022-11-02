@@ -1,8 +1,9 @@
-const express = require('express')
+/* eslint-disable @typescript-eslint/no-misused-promises */
+// see https://github.com/standard/eslint-config-standard-with-typescript/issues/613
 
-const basicAuth = require('../utils/basic-auth')
-
-const usersController = require('../controllers/users-controller')
+import express from 'express'
+import basicAuth from '../utils/basic-auth'
+import * as usersController from '../controllers/users-controller'
 
 const router = express.Router()
 
@@ -14,4 +15,4 @@ router.get('/:msjId/cpip', usersController.getCpip)
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
 
-module.exports = router
+export default router
