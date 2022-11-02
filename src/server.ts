@@ -12,20 +12,12 @@ Sentry.init({
   // for finer control
   tracesSampleRate: 1.0
 })
-console.log(`DEFAULT PORT: ${process.env.PORT}`)
-const port = getEnv('PORT', '5000')
-console.log(`PORT: ${port}`)
 
-sequelize
-  .sync()
-  .then(() => {
-    console.log('SYNCHED')
-    app.listen(port, function () {
-      console.log('Mon Suivi Justice back-end listening on', port)
-    })
-  })
-  .catch((err) => {
-    console.error('==== DB ERROR ===')
-    console.log(err)
-    console.error('==== ENDOF DB ERROR ===')
-  })
+const port = getEnv('PORT', '5000')
+;(async () => {
+  await sequelize.sync()
+
+  app.listen(port, () =>
+    console.log(`Mon Suivi Justice back-end listening on ${port}`)
+  )
+})().catch((err) => console.error(err))
