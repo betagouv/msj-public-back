@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import axios from 'axios'
 
 import HttpError from '../utils/http-error'
+import { getEnv } from '../utils/env'
 
 const getUserAppointments = async (
   req: Request,
@@ -10,9 +11,9 @@ const getUserAppointments = async (
 ) => {
   const msjId = req.params.msjId
 
-  const url = `${process.env.AGENTS_APP_API_URL}/convicts/${msjId}`
-  const username = process.env.AGENTS_APP_BASIC_AUTH_USERNAME
-  const password = process.env.AGENTS_APP_BASIC_AUTH_PASSWORD
+  const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}`
+  const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')
+  const password = getEnv('AGENTS_APP_BASIC_AUTH_PASSWORD')
 
   const headers = {
     Authorization:

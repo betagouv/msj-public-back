@@ -2,6 +2,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 
 import HttpError from '../utils/http-error'
+import { getEnv } from '../utils/env'
 
 export type RequestWithUser = Request & { userData?: { userId: string } }
 
@@ -17,7 +18,7 @@ const checkAuth = (req: RequestWithUser, res: Response, next: NextFunction) => {
     }
     const decodedToken: JwtPayload = jwt.verify(
       token,
-      process.env.JWT_SECRET || ''
+      getEnv('JWT_SECRET')
     ) as JwtPayload
     req.userData = { userId: decodedToken.userId }
     next()

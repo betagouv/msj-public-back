@@ -1,5 +1,6 @@
 import https from 'https'
 import querystring from 'node:querystring'
+import { getEnv } from '../utils/env'
 
 class SMSService {
   public username: string
@@ -8,10 +9,10 @@ class SMSService {
   public sendPath: string
 
   constructor (private readonly smsData: any) {
-    this.username = process.env.LM_ACCOUNT || ''
-    this.password = process.env.LM_PWD || ''
-    this.host = process.env.LM_HOST || ''
-    this.sendPath = process.env.LM_SEND_PATH || ''
+    this.username = getEnv('LM_ACCOUNT')
+    this.password = getEnv('LM_PWD')
+    this.host = getEnv('LM_HOST')
+    this.sendPath = getEnv('LM_SEND_PATH')
   }
 
   buildPostData () {

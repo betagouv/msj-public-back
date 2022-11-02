@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { getEnv } from './env'
 import HttpError from './http-error'
 
 export default async function basicAuth (
@@ -20,8 +21,8 @@ export default async function basicAuth (
   const [username, password] = credentials.split(':')
 
   if (
-    username !== process.env.HTTP_BASIC_AUTH_USER ||
-    password !== process.env.HTTP_BASIC_AUTH_PSWD
+    username !== getEnv('HTTP_BASIC_AUTH_USER') ||
+    password !== getEnv('HTTP_BASIC_AUTH_PSWD')
   ) {
     throw new HttpError('Invalid Authentication Credentials', 401)
   }

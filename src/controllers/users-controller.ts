@@ -7,6 +7,7 @@ import axios from 'axios'
 import User from '../models/user'
 import HttpError from '../utils/http-error'
 import SMSService from '../services/sms-service'
+import { getEnv } from '../utils/env'
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
   const { password, invitationToken } = req.body
@@ -31,7 +32,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
       try {
         token = jwt.sign(
           { id: invitedUser.id, phone: invitedUser.phone },
-          process.env.JWT_SECRET || '',
+          getEnv('JWT_SECRET'),
           { expiresIn: '1h' }
         )
       } catch (err) {
@@ -130,11 +131,9 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   let token
   try {
-    token = jwt.sign(
-      { id: user.id, phone: user.phone },
-      process.env.JWT_SECRET!,
-      { expiresIn: '1h' }
-    )
+    token = jwt.sign({ id: user.id, phone: user.phone }, getEnv('JWT_SECRET'), {
+      expiresIn: '1h'
+    })
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
@@ -202,14 +201,16 @@ const resetPassword = async (
     return next(error)
   }
 
-  const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
+  const invitationUrl = `${getEnv(
+    'FRONT_INVITATION_URL'
+  )}?token=${invitationToken}`
   const messageText = `Bonjour, vous avez demandé à modifier votre mot de passe sur Mon suivi Justice. Pour effectuer ce changement, cliquez sur le lien suivant : ${invitationUrl}`
 
   const resetPasswordSMSData = {
     destinationAddress: phoneWithAreaCode,
     messageText,
     originatorTON: '1',
-    originatingAddress: process.env.SMS_SENDER,
+    originatingAddress: getEnv('SMS_SENDER'),
     maxConcatenatedMessages: 10
   }
 
@@ -252,7 +253,9 @@ const invite = async (req: Request, res: Response, next: NextFunction) => {
 
     await user.save()
 
-    const invitationUrl = `${process.env.FRONT_INVITATION_URL}?token=${invitationToken}`
+    const invitationUrl = `${getEnv(
+      'FRONT_INVITATION_URL'
+    )}?token=${invitationToken}`
 
     if (created) {
       messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
@@ -264,7 +267,7 @@ const invite = async (req: Request, res: Response, next: NextFunction) => {
       destinationAddress: phone,
       messageText,
       originatorTON: '1',
-      originatingAddress: process.env.SMS_SENDER,
+      originatingAddress: getEnv('SMS_SENDER'),
       maxConcatenatedMessages: 10
     }
 
@@ -279,10 +282,9 @@ const invite = async (req: Request, res: Response, next: NextFunction) => {
 
 const getCpip = async (req: Request, res: Response, next: NextFunction) => {
   const msjId = req.params.msjId
-
-  const url = `${process.env.AGENTS_APP_API_URL}/convicts/${msjId}/cpip`
-  const username = process.env.AGENTS_APP_BASIC_AUTH_USERNAME
-  const password = process.env.AGENTS_APP_BASIC_AUTH_PASSWORD
+  const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}/cpip`
+  const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')
+  const password = getEnv('AGENTS_APP_BASIC_AUTH_PASSWORD')
 
   const headers = {
     Authorization:
