@@ -17,7 +17,7 @@ const checkAuth = (
   try {
     const token = req?.headers?.authorization?.split(' ')[1] ?? ''
 
-    if (token !== '') {
+    if (token === '') {
       throw new Error("Cette opération n'est pas authorisée")
     }
     const decodedToken: JwtPayload = jwt.verify(
