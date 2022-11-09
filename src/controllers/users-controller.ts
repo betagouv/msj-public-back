@@ -2,12 +2,12 @@ import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import axios from 'axios'
 
 import User from '../models/user'
-import HttpError from '../utils/http-error'
 import SMSService from '../services/sms-service'
 import { getEnv } from '../utils/env'
+import HttpError from '../utils/http-error'
+import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
 
 const signup = async (
   req: Request,
@@ -51,6 +51,14 @@ const signup = async (
 
       try {
         await invitedUser.save()
+        try {
+          await validateInvitation(invitedUser.msjId)
+        } catch (error) {
+          console.error(
+            "Une erreur s'est produite lors de la mise a jour de l'invitation: ",
+            error
+          )
+        }
       } catch (err) {
         const error = new HttpError(
           "Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site",
@@ -248,7 +256,7 @@ const invite = async (
 
   try {
     const [user, created] = await User.findOrCreate({
-      where: { phone: req.body.phone },
+      where: { phone, msjId },
       defaults: {
         phone,
         firstName,
@@ -296,25 +304,13 @@ const getCpip = async (
   next: NextFunction
 ): Promise<void> => {
   const msjId = req.params.msjId
-  const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}/cpip`
-  const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')
-  const password = getEnv('AGENTS_APP_BASIC_AUTH_PASSWORD')
-
-  const headers = {
-    Authorization:
-      'Basic ' + Buffer.from(username + ':' + password).toString('base64'),
-    'Content-type': 'application/json'
-  }
 
   let cpip
 
   try {
-    const response = await axios.get(url, {
-      headers
-    })
-
-    cpip = response.data
+    cpip = await getCpipRequest(msjId)
   } catch (err) {
+    console.error(err)
     const error = new HttpError('Impossible de trouver un cpip référent', 404)
     return next(error)
   }
