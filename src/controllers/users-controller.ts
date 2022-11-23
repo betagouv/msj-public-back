@@ -318,4 +318,74 @@ const getCpip = async (
   res.status(201).json(cpip)
 }
 
-export { login, signup, invite, resetPassword, getCpip }
+const updateUserPhoneNumber = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { phone }: { phone?: string } = req.body
+  const msjId = req.params.msjId
+
+  if (phone === undefined || msjId === undefined) {
+    const error = new HttpError('Missing parameters phone or convict id', 403)
+    return next(error)
+  }
+
+  const phoneWithAreaCode = phone.startsWith('+33')
+    ? phone
+    : phone.replace(/\D|^0+/g, '+33')
+
+  let user: User | null
+
+  // Check user existence
+  try {
+    user = await User.findOne({
+      where: { msjId }
+    })
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  if (user == null) {
+    const error = new HttpError(
+      'Le msj_id ne correspond à aucun utilisateur',
+      404
+    )
+    return next(error)
+  }
+
+  try {
+    user.set({
+      phone
+    })
+    user = await user.save()
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr. ${getEnv(
+    'FRONT_DOMAIN'
+  )}`
+
+  const updatePhoneSMSData = {
+    destinationAddress: phoneWithAreaCode,
+    messageText,
+    originatorTON: '1',
+    originatingAddress: getEnv('SMS_SENDER'),
+    maxConcatenatedMessages: 10
+  }
+
+  const sms = new SMSService(updatePhoneSMSData)
+  sms.send()
+  res.status(200).json({ message: 'Phone number updated' })
+}
+
+export { login, signup, invite, resetPassword, getCpip, updateUserPhoneNumber }

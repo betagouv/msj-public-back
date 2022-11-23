@@ -1,6 +1,13 @@
 import axios from 'axios'
 import { getEnv } from './env'
 
+interface Agent {
+  organization_name: string
+  first_name: string
+  last_name: string
+  email: string
+}
+
 function getHeaders (): {
   Authorization: string
   'Content-type': 'application/json'
@@ -15,7 +22,7 @@ function getHeaders (): {
   }
 }
 
-export async function getCpip (convictId: string | number) {
+export async function getCpip (convictId: string | number): Promise<Agent> {
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${convictId}/cpip`
 
   const cpip = await axios.get(url, {
@@ -25,7 +32,9 @@ export async function getCpip (convictId: string | number) {
   return cpip.data
 }
 
-export async function validateInvitation (msjId: string | number) {
+export async function validateInvitation (
+  msjId: string | number
+): Promise<void> {
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}/invitation`
   return await axios.patch(url, {}, { headers: getHeaders() })
 }
