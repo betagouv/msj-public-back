@@ -14,5 +14,10 @@ router.get('/:msjId/cpip', usersController.getCpip)
 
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
+router.patch(
+  '/:msjId/update-phone',
+  basicAuth,
+  usersController.updateUserPhoneNumber
+)
 
 export default router
