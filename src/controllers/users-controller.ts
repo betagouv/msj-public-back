@@ -326,14 +326,14 @@ const updateUserPhoneNumber = async (
   const { phone }: { phone?: string } = req.body
   const msjId = req.params.msjId
 
-  if (!phone || !msjId) {
-    const error = new HttpError('Missing parameters phone or msj_id', 403)
-    next(error)
+  if (phone === undefined || msjId === undefined) {
+    const error = new HttpError('Missing parameters phone or convict id', 403)
+    return next(error)
   }
 
-  const phoneWithAreaCode = phone!.startsWith('+33')
-    ? phone!
-    : phone!.replace(/\D|^0+/g, '+33')
+  const phoneWithAreaCode = phone.startsWith('+33')
+    ? phone
+    : phone.replace(/\D|^0+/g, '+33')
 
   let user: User | null
 
