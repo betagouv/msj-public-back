@@ -371,9 +371,8 @@ const updateUserPhoneNumber = async (
     return next(error)
   }
 
-  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr. ${getEnv(
-    'FRONT_DOMAIN'
-  )}`
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr. 
+  Lien vers votre espace personnel : ${getEnv('FRONT_DOMAIN')}`
 
   const updatePhoneSMSData = {
     destinationAddress: phoneWithAreaCode,
