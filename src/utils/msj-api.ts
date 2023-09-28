@@ -36,5 +36,6 @@ export async function validateInvitation (
   msjId: string | number
 ): Promise<void> {
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}/invitation`
+  console.log('url api validation invitation', url)
   return await axios.patch(url, {}, { headers: getHeaders() })
 }

@@ -25,5 +25,7 @@ export default function basicAuth (
     throw new HttpError('Invalid Authentication Credentials', 401)
   }
 
+  console.log('basic auth ok')
+
   next()
 }

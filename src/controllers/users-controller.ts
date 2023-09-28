@@ -52,6 +52,7 @@ const signup = async (
       try {
         await invitedUser.save()
         try {
+          console.log('Mise à jour de invitation avec msjId', invitedUser.msjId)
           await validateInvitation(invitedUser.msjId)
         } catch (error) {
           console.error(
