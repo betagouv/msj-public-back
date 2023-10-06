@@ -245,8 +245,6 @@ const invite = async (
     last_name: lastName
   } = req.body
 
-  console.log('body de la  requête', req.body)
-
   // TODO : validation sur la présence de ces paramètres.
   let messageText = ''
 
@@ -293,7 +291,6 @@ const invite = async (
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
   } catch (err) {
-    console.log('erreur invitation sms', err)
     return next(err)
   }
 }

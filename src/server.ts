@@ -17,7 +17,5 @@ const port = getEnv('PORT', '5000')
 ;(async () => {
   await sequelize.sync()
 
-  app.listen(port, () =>
-    console.log(`Mon Suivi Justice back-end listening on ${port}`)
-  )
+  app.listen(port)
 })().catch((err) => console.error(err))

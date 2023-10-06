@@ -5,7 +5,8 @@ import User from './user'
 
 const sequelize = new Sequelize(getEnv('DATABASE_URL'), {
   dialect: 'postgres',
-  models: [User] // or [Player, Team],
+  models: [User],
+  logging: process.env.NODE_ENV === 'production' ? false : console.log
 })
 
 export default sequelize
