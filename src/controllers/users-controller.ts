@@ -8,6 +8,7 @@ import SMSService from '../services/sms-service'
 import { getEnv } from '../utils/env'
 import HttpError from '../utils/http-error'
 import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
+import { InviteRequestBody } from '../models/interfaces'
 
 const signup = async (
   req: Request,
@@ -234,7 +235,7 @@ const resetPassword = async (
 }
 
 const invite = async (
-  req: Request,
+  req: Request<{}, {}, InviteRequestBody>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
