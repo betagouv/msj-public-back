@@ -9,6 +9,7 @@ import { getEnv } from '../utils/env'
 import HttpError from '../utils/http-error'
 import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
 import { InviteRequestBody } from '../models/interfaces'
+import { RequestWithUser } from '../middleware/check-auth'
 
 const signup = async (
   req: Request,
@@ -146,9 +147,13 @@ const login = async (
 
   let token
   try {
-    token = jwt.sign({ id: user.id, phone: user.phone }, getEnv('JWT_SECRET'), {
-      expiresIn: '1h'
-    })
+    token = jwt.sign(
+      { id: user.msjId, phone: user.phone },
+      getEnv('JWT_SECRET'),
+      {
+        expiresIn: '1h'
+      }
+    )
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
@@ -297,12 +302,18 @@ const invite = async (
 }
 
 const getCpip = async (
-  req: Request,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const msjId = req.params.msjId
-
+  const msjId = req.userData?.userId ?? ''
+  if (msjId === '') {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      401
+    )
+    return next(error)
+  }
   let cpip
 
   try {
