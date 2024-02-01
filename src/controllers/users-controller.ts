@@ -37,7 +37,7 @@ const signup = async (
 
       try {
         token = jwt.sign(
-          { id: invitedUser.id, phone: invitedUser.phone },
+          { id: invitedUser.msjId, phone: invitedUser.phone },
           getEnv('JWT_SECRET'),
           { expiresIn: '1h' }
         )
