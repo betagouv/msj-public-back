@@ -24,7 +24,6 @@ const checkAuth = (
       token,
       getEnv('JWT_SECRET')
     ) as JwtPayload
-    console.log(decodedToken)
     req.userData = { userId: decodedToken.id }
     next()
   } catch (error) {
