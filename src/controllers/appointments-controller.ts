@@ -11,9 +11,13 @@ const getUserAppointments = async (
   next: NextFunction
 ): Promise<void> => {
   const msjId = req.userData?.userId ?? ''
-
-  console.log(req.userData)
-
+  if (msjId === '') {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      401
+    )
+    return next(error)
+  }
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}`
   const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')
   const password = getEnv('AGENTS_APP_BASIC_AUTH_PASSWORD')
