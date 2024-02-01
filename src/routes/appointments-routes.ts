@@ -4,11 +4,16 @@
 import express from 'express'
 import * as appointmentsController from '../controllers/appointments-controller'
 import checkAuth from '../middleware/check-auth'
+import { createRateLimiter } from '../middleware/rate-limiter'
 
 const router = express.Router()
+const appointmentsLimiter = createRateLimiter(100, 15 * 60 * 1000)
 
-router.use(checkAuth)
-
-router.get('/:msjId', appointmentsController.getUserAppointments)
+router.get(
+  '/',
+  appointmentsLimiter,
+  checkAuth,
+  appointmentsController.getUserAppointments
+)
 
 export default router
