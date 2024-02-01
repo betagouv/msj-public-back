@@ -9,6 +9,6 @@ const router = express.Router()
 
 router.use(checkAuth)
 
-router.get('/:msjId', appointmentsController.getUserAppointments)
+router.get('/', appointmentsController.getUserAppointments)
 
 export default router

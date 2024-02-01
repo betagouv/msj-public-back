@@ -10,14 +10,10 @@ const router = express.Router()
 router.post('/signup', usersController.signup)
 router.post('/login', usersController.login)
 router.post('/reset-password', usersController.resetPassword)
-router.get('/:msjId/cpip', usersController.getCpip)
+router.get('/cpip', usersController.getCpip)
 
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
-router.patch(
-  '/:msjId/update-phone',
-  basicAuth,
-  usersController.updateUserPhoneNumber
-)
+router.patch('/update-phone', basicAuth, usersController.updateUserPhoneNumber)
 
 export default router
