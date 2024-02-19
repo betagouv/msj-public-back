@@ -280,9 +280,9 @@ const invite = async (
     )}?token=${invitationToken}`
 
     if (created) {
-      messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
+      messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos convocations devant le JAP et le SPIP, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     } else {
-      messageText = `Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
+      messageText = `Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos convocations devant le JAP et le SPIP, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     }
 
     const invitationSmsData = {
@@ -380,7 +380,7 @@ const updateUserPhoneNumber = async (
     return next(error)
   }
 
-  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr. 
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr.
   Lien vers votre espace personnel : ${getEnv('FRONT_DOMAIN')}`
 
   const updatePhoneSMSData = {
