@@ -13,7 +13,7 @@ const getUserAppointments = async (
   const msjId = req.userData?.userId ?? ''
   if (msjId === '') {
     const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      "Une erreur s'est produite lors de la récupération des convocations",
       401
     )
     return next(error)
@@ -38,7 +38,7 @@ const getUserAppointments = async (
     appointments = response.data.appointments
   } catch (err) {
     const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      "Une erreur s'est produite lors de la récupération des convocations",
       500
     )
     return next(error)

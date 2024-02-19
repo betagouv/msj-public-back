@@ -309,7 +309,7 @@ const getCpip = async (
   const msjId = req.userData?.userId ?? ''
   if (msjId === '') {
     const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      "Une erreur s'est produite lors de la récupération des convocations",
       401
     )
     return next(error)
