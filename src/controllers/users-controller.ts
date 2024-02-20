@@ -380,7 +380,7 @@ const updateUserPhoneNumber = async (
     return next(error)
   }
 
-  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr.
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contactez votre CPIP référent.
   Lien vers votre espace personnel : ${getEnv('FRONT_DOMAIN')}`
 
   const updatePhoneSMSData = {
@@ -436,6 +436,18 @@ const deleteUser = async (
     return next(error)
   }
 
+  const messageText = `Votre compte sur votre espace personnel MonSuiviJustice a été supprimé. Si vous pensez que c'est une erreur car votre mesure est toujours en cours, contactez votre CPIP référent.`
+
+  const informDeleteSMSData = {
+    destinationAddress: user.phone,
+    messageText,
+    originatorTON: '1',
+    originatingAddress: getEnv('SMS_SENDER'),
+    maxConcatenatedMessages: 10
+  }
+
+  const sms = new SMSService(informDeleteSMSData)
+  sms.send()
   res.status(200).json({ message: 'Convict deleted' })
 }
 
