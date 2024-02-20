@@ -3,7 +3,7 @@
 echo ""
 echo "You are deploying these commits to production :"
 echo ""
-git --no-pager log --oneline --no-decorate --abbrev-commit master..develop
+git --no-pager log --oneline --no-decorate --abbrev-commit main..develop
 echo ""
 read -p "Do you confirm ? (y/n)" -n 1
 
