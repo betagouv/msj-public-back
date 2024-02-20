@@ -344,6 +344,8 @@ const updateUserPhoneNumber = async (
     ? phone
     : phone.replace(/\D|^0+/g, '+33')
 
+  const simplePhone = phoneWithAreaCode.replace('+33', '0')
+
   let user: User | null
 
   // Check user existence
@@ -380,7 +382,7 @@ const updateUserPhoneNumber = async (
     return next(error)
   }
 
-  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contactez votre CPIP référent.
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${simplePhone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contactez votre CPIP référent.
   Lien vers votre espace personnel : ${getEnv('FRONT_DOMAIN')}`
 
   const updatePhoneSMSData = {
