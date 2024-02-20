@@ -396,4 +396,47 @@ const updateUserPhoneNumber = async (
   res.status(200).json({ message: 'Phone number updated' })
 }
 
-export { login, signup, invite, resetPassword, getCpip, updateUserPhoneNumber }
+const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const msjId = req.params.msjId
+
+  let user: User | null
+
+  // Check user existence
+  try {
+    user = await User.findOne({
+      where: { msjId }
+    })
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  if (user == null) {
+    const error = new HttpError(
+      'Le msj_id ne correspond à aucun utilisateur',
+      404
+    )
+    return next(error)
+  }
+
+  try {
+    await user.destroy()
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  res.status(200).json({ message: 'Convict deleted' })
+}
+
+export { login, signup, invite, resetPassword, getCpip, updateUserPhoneNumber, deleteUser }

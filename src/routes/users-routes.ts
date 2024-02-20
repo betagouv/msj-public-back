@@ -19,6 +19,6 @@ router.get('/cpip', usersLimiter, checkAuth, usersController.getCpip)
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
 router.patch('/update-phone', basicAuth, usersController.updateUserPhoneNumber)
-router.delete('/update-phone', basicAuth, usersController.updateUserPhoneNumber)
+router.delete('/:msjId', basicAuth, usersController.deleteUser)
 
 export default router
