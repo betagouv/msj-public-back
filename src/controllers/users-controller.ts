@@ -333,7 +333,7 @@ const updateUserPhoneNumber = async (
   next: NextFunction
 ): Promise<void> => {
   const { phone }: { phone?: string } = req.body
-  const msjId = req.params.msjId
+  const { msj_id: msjId }: { msj_id?: string } = req.body;
 
   if (phone === undefined || msjId === undefined) {
     const error = new HttpError('Missing parameters phone or convict id', 403)
