@@ -7,7 +7,7 @@ import checkAuth from '../middleware/check-auth'
 import { createRateLimiter } from '../middleware/rate-limiter'
 
 const router = express.Router()
-const appointmentsLimiter = createRateLimiter(100, 15 * 60 * 1000)
+const appointmentsLimiter = createRateLimiter(100, 3 * 60 * 1000)
 
 router.get(
   '/',

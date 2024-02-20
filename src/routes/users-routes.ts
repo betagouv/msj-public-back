@@ -8,7 +8,7 @@ import * as usersController from '../controllers/users-controller'
 import { createRateLimiter } from '../middleware/rate-limiter'
 
 const router = express.Router()
-const usersLimiter = createRateLimiter(100, 15 * 60 * 1000) // Par exemple, 100 requêtes / 15 minutes
+const usersLimiter = createRateLimiter(100, 3 * 60 * 1000) // Par exemple, 100 requêtes / 15 minutes
 
 router.post('/signup', usersController.signup)
 router.post('/login', usersController.login)
@@ -19,5 +19,6 @@ router.get('/cpip', usersLimiter, checkAuth, usersController.getCpip)
 // Specific endpoint for calls from the agents app
 router.post('/invite', basicAuth, usersController.invite)
 router.patch('/update-phone', basicAuth, usersController.updateUserPhoneNumber)
+router.delete('/update-phone', basicAuth, usersController.updateUserPhoneNumber)
 
 export default router
