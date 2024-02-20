@@ -8,6 +8,8 @@ import SMSService from '../services/sms-service'
 import { getEnv } from '../utils/env'
 import HttpError from '../utils/http-error'
 import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
+import { InviteRequestBody } from '../models/interfaces'
+import { RequestWithUser } from '../middleware/check-auth'
 
 const signup = async (
   req: Request,
@@ -35,7 +37,7 @@ const signup = async (
 
       try {
         token = jwt.sign(
-          { id: invitedUser.id, phone: invitedUser.phone },
+          { id: invitedUser.msjId, phone: invitedUser.phone },
           getEnv('JWT_SECRET'),
           { expiresIn: '1h' }
         )
@@ -145,9 +147,13 @@ const login = async (
 
   let token
   try {
-    token = jwt.sign({ id: user.id, phone: user.phone }, getEnv('JWT_SECRET'), {
-      expiresIn: '1h'
-    })
+    token = jwt.sign(
+      { id: user.msjId, phone: user.phone },
+      getEnv('JWT_SECRET'),
+      {
+        expiresIn: '1h'
+      }
+    )
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
@@ -234,7 +240,7 @@ const resetPassword = async (
 }
 
 const invite = async (
-  req: Request,
+  req: Request<{}, {}, InviteRequestBody>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -244,8 +250,6 @@ const invite = async (
     first_name: firstName,
     last_name: lastName
   } = req.body
-
-  console.log('body de la  requête', req.body)
 
   // TODO : validation sur la présence de ces paramètres.
   let messageText = ''
@@ -276,9 +280,9 @@ const invite = async (
     )}?token=${invitationToken}`
 
     if (created) {
-      messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos rendez-vous avec la Justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
+      messageText = `Bonjour, votre compte Mon Suivi Justice a été créé. Pour y accéder et suivre vos convocations devant le JAP et le SPIP, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     } else {
-      messageText = `Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos rendez-vous justice, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
+      messageText = `Bonjour, votre compte Mon Suivi Justice vous attend toujours. Pour y accéder et suivre vos convocations devant le JAP et le SPIP, cliquez sur le lien suivant et choisissez votre mot de passe: ${invitationUrl}`
     }
 
     const invitationSmsData = {
@@ -293,18 +297,23 @@ const invite = async (
     sms.send()
     res.status(200).json({ message: 'Invitation sent' })
   } catch (err) {
-    console.log('erreur invitation sms', err)
     return next(err)
   }
 }
 
 const getCpip = async (
-  req: Request,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const msjId = req.params.msjId
-
+  const msjId = req.userData?.userId ?? ''
+  if (msjId === '') {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de la récupération des convocations",
+      401
+    )
+    return next(error)
+  }
   let cpip
 
   try {
@@ -324,7 +333,7 @@ const updateUserPhoneNumber = async (
   next: NextFunction
 ): Promise<void> => {
   const { phone }: { phone?: string } = req.body
-  const msjId = req.params.msjId
+  const { msj_id: msjId }: { msj_id?: string } = req.body;
 
   if (phone === undefined || msjId === undefined) {
     const error = new HttpError('Missing parameters phone or convict id', 403)
@@ -371,7 +380,7 @@ const updateUserPhoneNumber = async (
     return next(error)
   }
 
-  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contacter votre CPIP référent ou support@mon-suivi-justice.beta.gouv.fr. 
+  const messageText = `Votre numéro de téléphone a été modifié. Pour accéder de nouveau à votre espace personnel, votre identifiant est ${phone}. Le mot de passe n'a pas été modifié. En cas de difficulté, contactez votre CPIP référent.
   Lien vers votre espace personnel : ${getEnv('FRONT_DOMAIN')}`
 
   const updatePhoneSMSData = {
@@ -387,4 +396,59 @@ const updateUserPhoneNumber = async (
   res.status(200).json({ message: 'Phone number updated' })
 }
 
-export { login, signup, invite, resetPassword, getCpip, updateUserPhoneNumber }
+const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const msjId = req.params.msjId
+
+  let user: User | null
+
+  // Check user existence
+  try {
+    user = await User.findOne({
+      where: { msjId }
+    })
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  if (user == null) {
+    const error = new HttpError(
+      'Le msj_id ne correspond à aucun utilisateur',
+      404
+    )
+    return next(error)
+  }
+
+  try {
+    await user.destroy()
+  } catch (err) {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
+      500
+    )
+    return next(error)
+  }
+
+  const messageText = `Votre compte sur votre espace personnel MonSuiviJustice a été supprimé. Si vous pensez que c'est une erreur car votre mesure est toujours en cours, contactez votre CPIP référent.`
+
+  const informDeleteSMSData = {
+    destinationAddress: user.phone,
+    messageText,
+    originatorTON: '1',
+    originatingAddress: getEnv('SMS_SENDER'),
+    maxConcatenatedMessages: 10
+  }
+
+  const sms = new SMSService(informDeleteSMSData)
+  sms.send()
+  res.status(200).json({ message: 'Convict deleted' })
+}
+
+export { login, signup, invite, resetPassword, getCpip, updateUserPhoneNumber, deleteUser }

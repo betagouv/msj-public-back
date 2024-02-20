@@ -11,7 +11,13 @@ const app: Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use(helmet())
+app.use(helmet({
+  hsts: {
+    maxAge: 60 * 60 * 24 * 365, // 1 year in seconds
+    includeSubDomains: true, // Must be true to pass the HSTS preload list requirements
+    preload: true
+  }
+}))
 
 app.use((req: Request, res: Response, next) => {
   res.setHeader('Access-Control-Allow-Origin', getEnv('FRONT_DOMAIN'))

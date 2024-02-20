@@ -24,7 +24,7 @@ const checkAuth = (
       token,
       getEnv('JWT_SECRET')
     ) as JwtPayload
-    req.userData = { userId: decodedToken.userId }
+    req.userData = { userId: decodedToken.id }
     next()
   } catch (error) {
     const err = new HttpError("Cette opération n'est pas autorisée", 401)

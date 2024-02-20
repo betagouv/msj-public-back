@@ -28,15 +28,7 @@ class SMSService {
         auth: `${this.username}:${this.password}`
       },
       (res) => {
-        console.log(`STATUS: ${res.statusCode ?? ''}`)
-        console.log(`HEADERS: ${JSON.stringify(res.headers)}`)
-        res.setEncoding('utf8')
-        res.on('data', (chunk: string) => {
-          console.log(`BODY: ${chunk}`)
-        })
-        res.on('error', (error) => {
-          console.log(error)
-        })
+        // TODO: handle response
       }
     )
 

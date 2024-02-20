@@ -1,16 +1,23 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import axios from 'axios'
 
 import HttpError from '../utils/http-error'
 import { getEnv } from '../utils/env'
+import { RequestWithUser } from '../middleware/check-auth'
 
 const getUserAppointments = async (
-  req: Request,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const msjId = req.params.msjId
-
+  const msjId = req.userData?.userId ?? ''
+  if (msjId === '') {
+    const error = new HttpError(
+      "Une erreur s'est produite lors de la récupération des convocations",
+      401
+    )
+    return next(error)
+  }
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}`
   const username = getEnv('AGENTS_APP_BASIC_AUTH_USERNAME')
   const password = getEnv('AGENTS_APP_BASIC_AUTH_PASSWORD')
@@ -31,7 +38,7 @@ const getUserAppointments = async (
     appointments = response.data.appointments
   } catch (err) {
     const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des rendez-vous",
+      "Une erreur s'est produite lors de la récupération des convocations",
       500
     )
     return next(error)
