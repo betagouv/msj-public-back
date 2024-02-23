@@ -319,7 +319,6 @@ const getCpip = async (
   try {
     cpip = await getCpipRequest(msjId)
   } catch (err) {
-    console.error(err)
     const error = new HttpError('Impossible de trouver un cpip référent', 404)
     return next(error)
   }
