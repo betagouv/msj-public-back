@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
 import { NextFunction, Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
 
 import User from '../models/user'
 import SMSService from '../services/sms-service'
+import * as JWTService from '../services/jwt-service'
 import { getEnv } from '../utils/env'
 import HttpError from '../utils/http-error'
 import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
@@ -36,10 +36,8 @@ const signup = async (
       }
 
       try {
-        token = jwt.sign(
-          { id: invitedUser.msjId, phone: invitedUser.phone },
-          getEnv('JWT_SECRET'),
-          { expiresIn: '1h' }
+        token = JWTService.sign(
+          { id: invitedUser.msjId, phone: invitedUser.phone }
         )
       } catch (err) {
         const error = new HttpError(
@@ -147,12 +145,8 @@ const login = async (
 
   let token
   try {
-    token = jwt.sign(
-      { id: user.msjId, phone: user.phone },
-      getEnv('JWT_SECRET'),
-      {
-        expiresIn: '1h'
-      }
+    token = JWTService.sign(
+      { id: user.msjId, phone: user.phone }
     )
   } catch (err) {
     const error = new HttpError(
