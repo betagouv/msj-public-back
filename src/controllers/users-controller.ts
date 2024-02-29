@@ -85,7 +85,6 @@ const signup = async (
     userId: invitedUser?.id,
     phone: invitedUser?.phone,
     token,
-    msjId: invitedUser?.msjId,
     firstName: invitedUser?.firstName,
     lastName: invitedUser?.lastName
   })
@@ -138,7 +137,7 @@ const login = async (
   if (!isValidPassword) {
     const error = new HttpError(
       'Le numéro de téléphone ou le mot de passe ne sont pas valides',
-      404
+      403
     )
     return next(error)
   }
@@ -159,7 +158,6 @@ const login = async (
   res.status(201).json({
     userId: user.id,
     phone: user.phone,
-    msjId: user.msjId,
     token,
     firstName: user.firstName,
     lastName: user.lastName
