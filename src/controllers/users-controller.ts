@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs'
 import crypto from 'node:crypto'
 import { NextFunction, Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
 
 import User from '../models/user'
 import SMSService from '../services/sms-service'
+import * as JWTService from '../services/jwt-service'
 import { getEnv } from '../utils/env'
 import HttpError from '../utils/http-error'
 import { getCpip as getCpipRequest, validateInvitation } from '../utils/msj-api'
@@ -36,10 +36,8 @@ const signup = async (
       }
 
       try {
-        token = jwt.sign(
-          { id: invitedUser.msjId, phone: invitedUser.phone },
-          getEnv('JWT_SECRET'),
-          { expiresIn: '1h' }
+        token = JWTService.sign(
+          { id: invitedUser.msjId, phone: invitedUser.phone }
         )
       } catch (err) {
         const error = new HttpError(
@@ -87,7 +85,6 @@ const signup = async (
     userId: invitedUser?.id,
     phone: invitedUser?.phone,
     token,
-    msjId: invitedUser?.msjId,
     firstName: invitedUser?.firstName,
     lastName: invitedUser?.lastName
   })
@@ -140,19 +137,15 @@ const login = async (
   if (!isValidPassword) {
     const error = new HttpError(
       'Le numéro de téléphone ou le mot de passe ne sont pas valides',
-      404
+      403
     )
     return next(error)
   }
 
   let token
   try {
-    token = jwt.sign(
-      { id: user.msjId, phone: user.phone },
-      getEnv('JWT_SECRET'),
-      {
-        expiresIn: '1h'
-      }
+    token = JWTService.sign(
+      { id: user.msjId, phone: user.phone }
     )
   } catch (err) {
     const error = new HttpError(
@@ -165,7 +158,6 @@ const login = async (
   res.status(201).json({
     userId: user.id,
     phone: user.phone,
-    msjId: user.msjId,
     token,
     firstName: user.firstName,
     lastName: user.lastName
