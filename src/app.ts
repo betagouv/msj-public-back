@@ -1,12 +1,24 @@
 import express, { Express, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
+import * as Sentry from '@sentry/node'
 
 import appointmentsRoutes from './routes/appointments-routes'
 import usersRoutes from './routes/users-routes'
 import { getEnv } from './utils/env'
 import HttpError from './utils/http-error'
+import { get } from 'http'
 
 const app: Express = express()
+
+Sentry.init({
+  dsn: getEnv('SENTRY_DSN'),
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0
+})
+
+app.use(Sentry.Handlers.requestHandler());
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -31,6 +43,8 @@ app.use((req: Request, res: Response, next) => {
 
 app.use('/api/users', usersRoutes)
 app.use('/api/appointments', appointmentsRoutes)
+
+app.use(Sentry.Handlers.errorHandler());
 
 app.use((req: Request, res: Response, next) => {
   const error = new HttpError('Could not find this route.', 404)
