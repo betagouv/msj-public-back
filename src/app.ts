@@ -8,8 +8,11 @@ import HttpError from './utils/http-error'
 
 const app: Express = express()
 
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.set('trust proxy', 1);
+
 
 app.use(helmet({
   hsts: {
