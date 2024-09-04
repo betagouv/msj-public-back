@@ -35,7 +35,7 @@
     "cls-hooked": "^4.2.2",
     "dotenv": "^16.0.2",
     "express": "^4.19.2",
-    "express-rate-limit": "^7.1.5",
+    "express-rate-limit": "^7.4.0",
     "helmet": "^6.0.0",
     "jsonwebtoken": "^9.0.0",
     "pg": "^8.12.0",
