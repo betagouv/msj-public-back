@@ -43,7 +43,7 @@ app.use((req: Request, res: Response, next) => {
 
 app.use(
   (
-    error: { code?: number, message?: string, originalError?: Error, sendToSentry?: boolean },
+    error: Partial<HttpError>,
     req: Request,
     res: Response,
     next: NextFunction
@@ -58,7 +58,7 @@ app.use(
 
 app.use(
   (
-    error: { code?: number, message?: string, originalError?: Error, sendToSentry?: boolean },
+    error: Partial<HttpError>,
     req: Request,
     res: Response,
     next: NextFunction
