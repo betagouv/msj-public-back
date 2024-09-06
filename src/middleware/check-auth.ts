@@ -23,7 +23,12 @@ const checkAuth = (
     req.userData = { userId: decodedToken.id }
     next()
   } catch (error) {
-    const err = new HttpError("Cette opération n'est pas autorisée", 401)
+    const err = new HttpError(
+      "Cette opération n'est pas autorisée",
+      401,
+      error instanceof Error ? error : undefined,
+      true
+    )
     return next(err)
   }
 }

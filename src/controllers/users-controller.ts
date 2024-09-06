@@ -31,7 +31,12 @@ const signup = async (
       try {
         hashedPassword = await bcrypt.hash(password, 12)
       } catch (err) {
-        const error = new HttpError("Impossible de créer l'utilisateur", 500)
+        const error = new HttpError(
+          "Impossible de créer l'utilisateur",
+          500,
+          err instanceof Error ? err : undefined,
+          true
+        )
         return next(error)
       }
 
@@ -42,7 +47,9 @@ const signup = async (
       } catch (err) {
         const error = new HttpError(
           "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-          500
+          500,
+          err instanceof Error ? err : undefined,
+          true
         )
         return next(error)
       }
@@ -54,15 +61,14 @@ const signup = async (
         try {
           await validateInvitation(invitedUser.msjId)
         } catch (error) {
-          console.error(
-            "Une erreur s'est produite lors de la mise a jour de l'invitation: ",
-            error
-          )
+
         }
       } catch (err) {
         const error = new HttpError(
           "Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site",
-          500
+          500,
+          err instanceof Error ? err : undefined,
+          true
         )
         return next(error)
       }
@@ -76,7 +82,9 @@ const signup = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la création de votre compte",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -106,10 +114,11 @@ const login = async (
       where: { phone: phoneWithAreaCode }
     })
   } catch (err) {
-    console.error(err)
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -129,7 +138,9 @@ const login = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -150,7 +161,9 @@ const login = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -187,7 +200,9 @@ const resetPassword = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -208,7 +223,9 @@ const resetPassword = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -302,7 +319,9 @@ const getCpip = async (
   if (msjId === '') {
     const error = new HttpError(
       "Une erreur s'est produite lors de la récupération des convocations",
-      401
+      401,
+      undefined,
+      true
     )
     return next(error)
   }
@@ -327,7 +346,12 @@ const updateUserPhoneNumber = async (
   const { msj_id: msjId }: { msj_id?: string } = req.body;
 
   if (phone === undefined || msjId === undefined) {
-    const error = new HttpError('Missing parameters phone or convict id', 403)
+    const error = new HttpError(
+      'Missing parameters phone or convict id',
+      403,
+      undefined,
+      true
+    )
     return next(error)
   }
 
@@ -347,7 +371,9 @@ const updateUserPhoneNumber = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -355,7 +381,9 @@ const updateUserPhoneNumber = async (
   if (user == null) {
     const error = new HttpError(
       'Le msj_id ne correspond à aucun utilisateur',
-      404
+      404,
+      undefined,
+      true
     )
     return next(error)
   }
@@ -368,7 +396,9 @@ const updateUserPhoneNumber = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -406,7 +436,9 @@ const deleteUser = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
@@ -414,7 +446,9 @@ const deleteUser = async (
   if (user == null) {
     const error = new HttpError(
       'Le msj_id ne correspond à aucun utilisateur',
-      404
+      404,
+      undefined,
+      true
     )
     return next(error)
   }
@@ -424,7 +458,9 @@ const deleteUser = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }

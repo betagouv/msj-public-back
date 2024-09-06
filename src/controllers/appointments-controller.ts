@@ -14,7 +14,9 @@ const getUserAppointments = async (
   if (msjId === '') {
     const error = new HttpError(
       "Une erreur s'est produite lors de la récupération des convocations",
-      401
+      401,
+      undefined,
+      true
     )
     return next(error)
   }
@@ -39,7 +41,9 @@ const getUserAppointments = async (
   } catch (err) {
     const error = new HttpError(
       "Une erreur s'est produite lors de la récupération des convocations",
-      500
+      500,
+      err instanceof Error ? err : undefined,
+      true
     )
     return next(error)
   }
