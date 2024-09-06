@@ -49,11 +49,8 @@ app.use(
     next: NextFunction
   ) => {
     if (error.sendToSentry) {
-      if (error.originalError) {
-        Sentry.captureException(error.originalError);
-      } else {
-        Sentry.captureException(error);
-      }
+      const toCapture = error.originalError || error
+      Sentry.captureException(toCapture);
     }
     next(error)
   }

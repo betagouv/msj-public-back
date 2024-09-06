@@ -22,12 +22,7 @@ export default function basicAuth (
     username !== getEnv('HTTP_BASIC_AUTH_USER') ||
     password !== getEnv('HTTP_BASIC_AUTH_PSWD')
   ) {
-    throw new HttpError(
-      'Invalid Authentication Credentials',
-      401,
-      undefined,
-      true
-    )
+    throw new HttpError('Invalid Authentication Credentials', 401, undefined, true)
   }
 
   next()
