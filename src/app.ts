@@ -5,6 +5,7 @@ import appointmentsRoutes from './routes/appointments-routes'
 import usersRoutes from './routes/users-routes'
 import { getEnv } from './utils/env'
 import HttpError from './utils/http-error'
+import * as Sentry from '@sentry/node'
 
 const app: Express = express()
 
@@ -42,7 +43,22 @@ app.use((req: Request, res: Response, next) => {
 
 app.use(
   (
-    error: { code?: number, message?: string },
+    error: Partial<HttpError>,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    if (error.sendToSentry) {
+      const toCapture = error.originalError || error
+      Sentry.captureException(toCapture);
+    }
+    next(error)
+  }
+)
+
+app.use(
+  (
+    error: Partial<HttpError>,
     req: Request,
     res: Response,
     next: NextFunction

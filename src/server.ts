@@ -13,9 +13,12 @@ Sentry.init({
   tracesSampleRate: 1.0
 })
 
-const port = getEnv('PORT', '5000')
-;(async () => {
-  await sequelize.sync()
-
-  app.listen(port)
-})().catch((err) => console.error(err))
+const port = getEnv('PORT', '5000');
+(async () => {
+  try {
+    await sequelize.sync();
+    app.listen(port);
+  } catch (err) {
+    Sentry.captureException(err);
+  }
+})();

@@ -31,7 +31,7 @@ const signup = async (
       try {
         hashedPassword = await bcrypt.hash(password, 12)
       } catch (err) {
-        const error = new HttpError("Impossible de créer l'utilisateur", 500)
+        const error = new HttpError("Impossible de créer l'utilisateur", 500, err, true)
         return next(error)
       }
 
@@ -40,10 +40,7 @@ const signup = async (
           { id: invitedUser.msjId, phone: invitedUser.phone }
         )
       } catch (err) {
-        const error = new HttpError(
-          "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-          500
-        )
+        const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500, err, true)
         return next(error)
       }
 
@@ -54,30 +51,18 @@ const signup = async (
         try {
           await validateInvitation(invitedUser.msjId)
         } catch (error) {
-          console.error(
-            "Une erreur s'est produite lors de la mise a jour de l'invitation: ",
-            error
-          )
+
         }
       } catch (err) {
-        const error = new HttpError(
-          "Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site",
-          500
-        )
+        const error = new HttpError("Une erreur s'est produite lors de l'enregistrement, contactez l'administrateur du site", 500, err, true)
         return next(error)
       }
     } else {
-      const error = new HttpError(
-        "Nous n'avons pas trouvé d'invitation associée à votre numéro",
-        404
-      )
+      const error = new HttpError("Nous n'avons pas trouvé d'invitation associée à votre numéro", 404)
       return next(error)
     }
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la création de votre compte",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la création de votre compte", 500, err, true)
     return next(error)
   }
 
@@ -106,19 +91,12 @@ const login = async (
       where: { phone: phoneWithAreaCode }
     })
   } catch (err) {
-    console.error(err)
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
   if (user == null) {
-    const error = new HttpError(
-      'Le numéro de téléphone ou le mot de passe ne sont pas valides',
-      404
-    )
+    const error = new HttpError('Le numéro de téléphone ou le mot de passe ne sont pas valides', 404)
     return next(error)
   }
 
@@ -127,18 +105,12 @@ const login = async (
   try {
     isValidPassword = await bcrypt.compare(password, user.password ?? '')
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
   if (!isValidPassword) {
-    const error = new HttpError(
-      'Le numéro de téléphone ou le mot de passe ne sont pas valides',
-      403
-    )
+    const error = new HttpError('Le numéro de téléphone ou le mot de passe ne sont pas valides', 403)
     return next(error)
   }
 
@@ -148,10 +120,7 @@ const login = async (
       { id: user.msjId, phone: user.phone }
     )
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la connexion, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
@@ -185,18 +154,12 @@ const resetPassword = async (
       where: { phone: phoneWithAreaCode }
     })
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
   if (user == null) {
-    const error = new HttpError(
-      'Le numéro de téléphone ne correspond à aucun utilisateur',
-      404
-    )
+    const error = new HttpError('Le numéro de téléphone ne correspond à aucun utilisateur', 404)
     return next(error)
   }
 
@@ -206,10 +169,7 @@ const resetPassword = async (
     })
     user = await user.save()
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de mot de passe, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
@@ -300,10 +260,7 @@ const getCpip = async (
 ): Promise<void> => {
   const msjId = req.userData?.userId ?? ''
   if (msjId === '') {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des convocations",
-      401
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la récupération des convocations", 401, undefined, true)
     return next(error)
   }
   let cpip
@@ -327,7 +284,7 @@ const updateUserPhoneNumber = async (
   const { msj_id: msjId }: { msj_id?: string } = req.body;
 
   if (phone === undefined || msjId === undefined) {
-    const error = new HttpError('Missing parameters phone or convict id', 403)
+    const error = new HttpError('Missing parameters phone or convict id', 403, undefined, true)
     return next(error)
   }
 
@@ -345,18 +302,12 @@ const updateUserPhoneNumber = async (
       where: { msjId }
     })
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
   if (user == null) {
-    const error = new HttpError(
-      'Le msj_id ne correspond à aucun utilisateur',
-      404
-    )
+    const error = new HttpError('Le msj_id ne correspond à aucun utilisateur', 404, undefined, true)
     return next(error)
   }
 
@@ -366,10 +317,7 @@ const updateUserPhoneNumber = async (
     })
     user = await user.save()
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de modification de numéro de téléphone, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
@@ -404,28 +352,19 @@ const deleteUser = async (
       where: { msjId }
     })
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
   if (user == null) {
-    const error = new HttpError(
-      'Le msj_id ne correspond à aucun utilisateur',
-      404
-    )
+    const error = new HttpError('Le msj_id ne correspond à aucun utilisateur', 404, undefined, true)
     return next(error)
   }
 
   try {
     await user.destroy()
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de votre demande de suppression du probationnaire, contactez l'administrateur du site", 500, err, true)
     return next(error)
   }
 
