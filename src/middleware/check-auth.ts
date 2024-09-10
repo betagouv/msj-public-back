@@ -22,9 +22,9 @@ const checkAuth = (
     const decodedToken: JWTService.TokenPayload  = JWTService.verify(token)
     req.userData = { userId: decodedToken.id }
     next()
-  } catch (error) {
-    const err = new HttpError("Cette opération n'est pas autorisée", 401)
-    return next(err)
+  } catch (err) {
+    const error = new HttpError("Cette opération n'est pas autorisée", 401, err, true)
+    return next(error)
   }
 }
 

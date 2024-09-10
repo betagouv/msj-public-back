@@ -12,10 +12,7 @@ const getUserAppointments = async (
 ): Promise<void> => {
   const msjId = req.userData?.userId ?? ''
   if (msjId === '') {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des convocations",
-      401
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la récupération des convocations", 401, undefined, true)
     return next(error)
   }
   const url = `${getEnv('AGENTS_APP_API_URL')}/convicts/${msjId}`
@@ -37,10 +34,7 @@ const getUserAppointments = async (
 
     appointments = response.data.appointments
   } catch (err) {
-    const error = new HttpError(
-      "Une erreur s'est produite lors de la récupération des convocations",
-      500
-    )
+    const error = new HttpError("Une erreur s'est produite lors de la récupération des convocations", 500, err, true)
     return next(error)
   }
 
