@@ -57,7 +57,7 @@
     "@types/sequelize": "^4.28.20",
     "@types/validator": "^13.12.2",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
-    "@typescript-eslint/parser": "^8.6.0",
+    "@typescript-eslint/parser": "^8.7.0",
     "eslint": "^8.57.1",
     "eslint-config-love": "^71.0.0",
     "eslint-config-standard": "^17.1.0",
