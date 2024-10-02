@@ -2,16 +2,8 @@
 import User from './models/user';
 import sequelize from './models';
 
-console.log("ENCRYPTION_KEY:", process.env.ENCRYPTION_KEY);
-console.log("HMAC_KEY:", process.env.HMAC_KEY);
-console.log("IV_LENGTH:", process.env.IV_LENGTH);
-
 (async () => {
   try {
-    console.log("ENCRYPTION_KEY:", process.env.ENCRYPTION_KEY);
-    console.log("HMAC_KEY:", process.env.HMAC_KEY);
-    console.log("IV_LENGTH:", process.env.IV_LENGTH);
-
     await sequelize.sync();
     // Récupérer tous les utilisateurs existants
     const users = await User.findAll();
@@ -34,7 +26,7 @@ console.log("IV_LENGTH:", process.env.IV_LENGTH);
       if (user.phone) {
         const encryptedPhone = User.encrypt(user.phone);
         updateData.phone = encryptedPhone;
-        updateData.phoneHash = User.generatePhoneHash(encryptedPhone);
+        updateData.phoneHash = User.generatePhoneHash(user.phone);
       }
 
       // Mettre à jour l'utilisateur dans la base de données
