@@ -2,7 +2,6 @@ import { Sequelize } from 'sequelize-typescript'
 import User from './models/user';
 import { getEnv } from './utils/env';
 
-
 const sequelize = new Sequelize(getEnv('DATABASE_URL'), {
   dialect: 'postgres',
   models: [User],
@@ -11,11 +10,6 @@ const sequelize = new Sequelize(getEnv('DATABASE_URL'), {
 
 (async () => {
   try {
-
-    console.log(process.env.ENCRYPTION_KEY)
-    console.log(process.env.IV_LENGTH)
-    console.log(process.env.HMAC_KEY)
-    
     // Récupérer tous les utilisateurs existants
     const users = await User.findAll();
 
