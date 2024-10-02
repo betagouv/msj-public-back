@@ -1,6 +1,8 @@
 import { DataTypes } from 'sequelize';
 import { Table, Column, Model, BeforeCreate, BeforeUpdate, AfterFind } from 'sequelize-typescript';
 import * as crypto from 'crypto';
+import { getEnv } from '../utils/env';
+
 
 @Table
 export default class User extends Model {
@@ -25,10 +27,10 @@ export default class User extends Model {
   @Column({ type: DataTypes.INTEGER, allowNull: false, unique: true })
   msjId!: number
 
-  static hmacKey = process.env.HMAC_KEY;
+  static hmacKey = getEnv("HMAC_KEY");
 
-  static encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
-  static ivLength = parseInt(process.env.IV_LENGTH!, 10);
+  static encryptionKey = Buffer.from(getEnv("ENCRYPTION_KEY")!, 'hex');
+  static ivLength = parseInt(getEnv("IV_LENGTH")!, 10);
 
   // Fonction pour chiffrer le téléphone
   static encrypt(text: string) {
@@ -86,7 +88,7 @@ export default class User extends Model {
     }
   }
   // Déchiffrement des colonnes après lecture
-  @AfterFind
+  // @AfterFind
   static decryptSensitiveData(instance: User | User[]) {
     if (Array.isArray(instance)) {
       instance.forEach((user) => User.decryptFields(user));
