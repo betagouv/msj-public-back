@@ -1,15 +1,18 @@
-import { Sequelize } from 'sequelize-typescript'
-import User from './models/user';
-import { getEnv } from './utils/env';
 
-const sequelize = new Sequelize(getEnv('DATABASE_URL'), {
-  dialect: 'postgres',
-  models: [User],
-  logging: process.env.NODE_ENV === 'production' ? false : console.log
-});
+import User from './models/user';
+import sequelize from './models';
+
+console.log("ENCRYPTION_KEY:", process.env.ENCRYPTION_KEY);
+console.log("HMAC_KEY:", process.env.HMAC_KEY);
+console.log("IV_LENGTH:", process.env.IV_LENGTH);
 
 (async () => {
   try {
+    console.log("ENCRYPTION_KEY:", process.env.ENCRYPTION_KEY);
+    console.log("HMAC_KEY:", process.env.HMAC_KEY);
+    console.log("IV_LENGTH:", process.env.IV_LENGTH);
+
+    await sequelize.sync();
     // Récupérer tous les utilisateurs existants
     const users = await User.findAll();
 
