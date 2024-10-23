@@ -83,13 +83,15 @@ const login = async (
   const { phone, password } = req.body
   const phoneWithAreaCode = phone.replace(/\D|^0+/g, '+33')
 
-  let user
+  // Générer le `phoneHash` basé sur le numéro de téléphone brut
+  const phoneHash = User.generatePhoneHash(phoneWithAreaCode);
 
-  // Check user existence
+  // Rechercher l'utilisateur par `phoneHash`
+  let user;
   try {
     user = await User.findOne({
-      where: { phone: phoneWithAreaCode }
-    })
+      where: { phoneHash }
+    });
   } catch (err) {
     const error = new HttpError("Une erreur s'est produite lors de la connexion, contactez l'administrateur du site", 500, err, true)
     return next(error)
