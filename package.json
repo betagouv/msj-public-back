@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/betagouv/msj-public-back#readme",
   "dependencies": {
-    "@sentry/node": "^8.38.0",
+    "@sentry/node": "^8.40.0",
     "@sentry/tracing": "^7.114.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
