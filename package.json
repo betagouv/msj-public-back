@@ -30,7 +30,7 @@
   "dependencies": {
     "@sentry/node": "^8.54.0",
     "@sentry/tracing": "^7.120.3",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "bcryptjs": "^2.4.3",
     "cls-hooked": "^4.2.2",
     "dotenv": "^16.4.7",
